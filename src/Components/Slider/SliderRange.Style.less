@@ -1,0 +1,56 @@
+@import "Constants/CommonConstants.less";
+
+.slider-wrapper {
+  .ant-slider-rail {
+    height: 10px;
+    border-radius: 99px;
+    background-color: transparent;
+  }
+  .ant-slider-track {
+    height: 10px;
+    border-radius: 99px;
+  }
+  .slider-handle-color-hover {
+    background-color: @MAIN_COLOR;
+  }
+  .ant-slider-handle {
+    height: 20px;
+    width: 20px;
+    background-color: @MAIN_COLOR;
+  }
+  .ant-slider-mark {
+    top: -20px;
+    left: 3%;
+    .ant-slider-mark-text:last-child {
+      left: 92% !important;
+    }
+  }
+  .ant-slider-step {
+    height: 10px;
+  }
+  .ant-slider-dot {
+    display: none;
+  }
+}
+.ant-slider:hover {
+  background-color: transparent;
+}
+.ant-slider:hover .ant-slider-track {
+  background-color: @MAIN_COLOR;
+}
+.ant-slider:hover .ant-slider-rail {
+  background-color: transparent;
+}
+.ant-slider:hover .ant-slider-handle {
+  border-color: @MAIN_COLOR;
+}
+
+@media (max-width: @screen-sm){
+  .slider-wrapper{
+    .ant-slider-mark {
+      .ant-slider-mark-text:last-child {
+        left: 82% !important;
+      }
+    }
+  }
+}

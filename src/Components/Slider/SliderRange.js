@@ -1,23 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Slider } from "antd";
 import "antd/dist/antd.css";
 
-import { COLOR } from "../../Constants/CommonConstants";
+import "./SliderRange.Style.less";
+import { COLORS } from "Constants/CommonConstants";
 
 const marks = {
   100: "100 con",
   5000: "5000 con",
 };
 
-const SliderRange = () => {
+const SliderRange = ({ isBackground, handleData }) => {
+  // State
+  const [quantity, setQuantity] = useState(0);
+
+  // Function
+  const handleChange = (value) => {
+    setQuantity(value);
+    handleData(value);
+  };
+
   return (
     <Slider
-      trackStyle={{ backgroundColor: COLOR.MAIN_COLOR }}
-      handleStyle={{ borderColor: COLOR.MAIN_COLOR }}
+      className="slider-wrapper"
       marks={marks}
       min={100}
       max={5000}
       step={50}
+      value={quantity}
+      onChange={handleChange}
+      railStyle={{
+        border: `1px solid ${isBackground ? "white" : COLORS.MAIN_COLOR}`,
+      }}
+      handleStyle={{
+        border: `1px solid ${isBackground ? "white" : COLORS.MAIN_COLOR}`,
+      }}
+      trackStyle={{
+        backgroundColor: `${isBackground ? "white" : COLORS.MAIN_COLOR}`,
+      }}
     />
   );
 };

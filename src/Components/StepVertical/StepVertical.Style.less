@@ -1,0 +1,26 @@
+@import "Constants/CommonConstants.less";
+
+.step-vertical-wrapper {
+  margin-top: @margin-lg;
+  .ant-steps-item-finish
+    > .ant-steps-item-container
+    > .ant-steps-item-tail::after,
+  .ant-steps-item-finish
+    .ant-steps-item-icon
+    > .ant-steps-icon
+    .ant-steps-icon-dot,
+  .ant-steps-item-process
+    .ant-steps-item-icon
+    > .ant-steps-icon
+    .ant-steps-icon-dot,
+  .ant-steps-item-process
+    > .ant-steps-item-container
+    > .ant-steps-item-tail::after {
+    background-color: @MAIN_COLOR;
+  }
+  .ant-steps-item:last-child
+    > .ant-steps-item-container
+    > .ant-steps-item-tail {
+    display: block;
+  }
+}

@@ -1,13 +1,15 @@
 import { Button } from "antd";
 import React from "react";
 
-import { COLOR } from "../../Constants/CommonConstants";
+import "./CommonButton.Style.less";
 
-const CommonButton = ({ title }) => {
+const CommonButton = ({ title, href }) => {
   return (
-    <ButtonWrapper>
-      <Button className="button">{title}</Button>;
-    </ButtonWrapper>
+    <div className="button-wrapper">
+      <Button href={href} className="button">
+        {title}
+      </Button>
+    </div>
   );
 };
 

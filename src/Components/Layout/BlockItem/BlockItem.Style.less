@@ -1,0 +1,24 @@
+@import "Constants/CommonConstants.less";
+
+.block-item-wrapper {
+  margin: @margin-lg 0;
+  padding: @padding-lg 0;
+  .title {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .sub-title {
+    text-align: center;
+  }
+  .btn-block,
+  .slider-block {
+    margin-top: @margin-lg;
+  }
+}
+
+@media (max-width: @screen-lg) {
+  .block-item-wrapper {
+    padding: @padding-lg 15px;
+  }
+}
