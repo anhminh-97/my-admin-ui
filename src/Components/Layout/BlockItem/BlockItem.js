@@ -15,8 +15,11 @@ const BlockItem = ({
   topPrice,
   bottomPrice,
 }) => {
+
+  // State
   const [quantity, setQuantity] = useState(100);
 
+  // Function
   const handleData = (value) => {
     setQuantity(value);
   };

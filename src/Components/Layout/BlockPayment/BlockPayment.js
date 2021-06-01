@@ -1,6 +1,6 @@
 import { Col, Row } from "antd";
-import StepHorizontal from "Components/StepHorizontal";
-import StepVertical from "Components/StepVertical";
+import StepHorizontal from "Components/Step/StepHorizontal";
+import StepVertical from "Components/Step/StepVertical";
 import React from "react";
 
 import "./BlockPayment.Style.less";
