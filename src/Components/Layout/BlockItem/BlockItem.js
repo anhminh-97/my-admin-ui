@@ -106,7 +106,7 @@ const BlockItem = ({
         </Row>
         <Row justify="center" className="btn-block">
           <Col>
-            <CommonButton href="#payment" title="Cách thức thanh toán" />
+            <CommonButton href="payment" title="Cách thức thanh toán" />
           </Col>
         </Row>
       </Col>

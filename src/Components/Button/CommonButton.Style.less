@@ -1,15 +1,15 @@
 @import "Constants/CommonConstants.less";
 .button-wrapper {
-  .ant-btn.button {
+  background-color: @YELLOW;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 40px;
+  color: @black;
+  transition: all 0.3s linear;
+  &:hover {
     background-color: @YELLOW;
+    color: @black;
+    opacity: 0.7;
     border: none;
-    border-radius: 5px;
-    padding: 0 40px;
-    &:hover {
-      background-color: @YELLOW;
-      color: @black;
-      opacity: 0.7;
-      border: none;
-    }
   }
 }
