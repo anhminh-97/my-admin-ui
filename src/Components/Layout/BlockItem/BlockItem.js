@@ -77,8 +77,8 @@ const BlockItem = ({
                 >
                   <NumberFormat
                     value={
-                      (topPrice + bottomPrice) *
-                      (quantity.topSlider + quantity.bottomSlider)
+                      topPrice * quantity.topSlider +
+                      bottomPrice * quantity.bottomSlider
                     }
                     thousandSeparator={true}
                     displayType={"text"}
