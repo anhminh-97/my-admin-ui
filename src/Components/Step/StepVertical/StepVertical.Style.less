@@ -2,6 +2,7 @@
 
 .step-vertical-wrapper {
   margin-top: @margin-lg;
+  margin-left: 90px;
   .ant-steps-item-finish
     > .ant-steps-item-container
     > .ant-steps-item-tail::after,
@@ -22,5 +23,17 @@
     > .ant-steps-item-container
     > .ant-steps-item-tail {
     display: block;
+  }
+  .ant-steps-item-finish
+    > .ant-steps-item-container
+    > .ant-steps-item-content
+    > .ant-steps-item-description {
+    color: @black;
+  }
+  .ant-steps-item-title {
+    position: absolute;
+    left: -100%;
+    right: 100%;
+    text-align: right;
   }
 }

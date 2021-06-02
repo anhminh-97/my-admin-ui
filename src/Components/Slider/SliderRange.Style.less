@@ -23,6 +23,7 @@
     left: 3%;
     .ant-slider-mark-text:last-child {
       left: 92% !important;
+      transform: translateX(-20%) !important;
     }
   }
   .ant-slider-step {
@@ -44,11 +45,15 @@
 .ant-slider:hover .ant-slider-handle {
   border-color: @MAIN_COLOR;
 }
+.ant-tooltip {
+  display: block;
+}
 
-@media (max-width: @screen-sm){
-  .slider-wrapper{
+@media (max-width: @screen-sm) {
+  .slider-wrapper {
     .ant-slider-mark {
       .ant-slider-mark-text:last-child {
+        transform: translateX(0) !important;
         left: 82% !important;
       }
     }
