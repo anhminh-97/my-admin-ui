@@ -12,6 +12,8 @@ const Home = () => {
         value={20000000}
         topPrice={70}
         bottomPrice={115}
+        leftTitle="Phí cài đặt (Thanh toán một lần duy nhất)"
+        rightTitle="Phí vận hành (Thanh toán hằng tháng)"
       />
       <BlockItem
         title="Chi phí của trang trại cao cấp"
@@ -20,6 +22,8 @@ const Home = () => {
         value={40000000}
         topPrice={80}
         bottomPrice={125}
+        leftTitle="Chi phí đầu tư một lần"
+        rightTitle="Chi phí vận hành hằng ngày"
       />
       <BlockPayment />
     </>

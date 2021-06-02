@@ -14,8 +14,9 @@ const BlockItem = ({
   value,
   topPrice,
   bottomPrice,
+  leftTitle,
+  rightTitle,
 }) => {
-
   // State
   const [quantity, setQuantity] = useState(100);
 
@@ -39,17 +40,28 @@ const BlockItem = ({
         </Row>
         <Row className="slider-block">
           <Col span={24}>
-            <SliderRange handleData={handleData} isBackground={isBackground} />
+            <SliderRange
+              label="Bò thịt"
+              isMark
+              handleData={handleData}
+              isBackground={isBackground}
+            />
+            <SliderRange
+              label="Bò nái"
+              handleData={handleData}
+              isBackground={isBackground}
+            />
           </Col>
         </Row>
         <Row gutter={[20, 48]}>
           <Col xs={24} md={12}>
-            <h3>Chi phí đầu tư một lần</h3>
+            <h3>{leftTitle}</h3>
             <CardItem value={value} />
           </Col>
           <Col xs={24} md={12}>
-            <h3>Chi phí vận hành hằng ngày</h3>
+            <h3>{rightTitle}</h3>
             <Row gutter={[24, 24]}>
+              <Col span={24}></Col>
               <Col span={24}>
                 <SmallCard
                   name="Bò Thịt"
