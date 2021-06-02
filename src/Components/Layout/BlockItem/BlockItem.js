@@ -6,6 +6,7 @@ import CommonButton from "../../Button/CommonButton";
 import SliderRange from "../../Slider/SliderRange";
 import { COLORS } from "Constants/CommonConstants";
 import "./BlockItem.Style.less";
+import NumberFormat from "react-number-format";
 
 const BlockItem = ({
   title,
@@ -18,11 +19,17 @@ const BlockItem = ({
   rightTitle,
 }) => {
   // State
-  const [quantity, setQuantity] = useState(100);
+  const [quantity, setQuantity] = useState({
+    topSlider: 100,
+    bottomSlider: 100,
+  });
 
   // Function
-  const handleData = (value) => {
-    setQuantity(value);
+  const handleTopData = (value) => {
+    setQuantity({ ...quantity, topSlider: value });
+  };
+  const handleBottomData = (value) => {
+    setQuantity({ ...quantity, bottomSlider: value });
   };
 
   return (
@@ -43,12 +50,12 @@ const BlockItem = ({
             <SliderRange
               label="Bò thịt"
               isMark
-              handleData={handleData}
+              handleData={handleTopData}
               isBackground={isBackground}
             />
             <SliderRange
               label="Bò nái"
-              handleData={handleData}
+              handleData={handleBottomData}
               isBackground={isBackground}
             />
           </Col>
@@ -61,19 +68,37 @@ const BlockItem = ({
           <Col xs={24} md={12}>
             <h3>{rightTitle}</h3>
             <Row gutter={[24, 24]}>
-              <Col span={24}></Col>
+              <Col span={24}>
+                <div
+                  className="total"
+                  style={{
+                    color: `${isBackground ? "white" : COLORS.MAIN_COLOR}`,
+                  }}
+                >
+                  <NumberFormat
+                    value={
+                      (topPrice + bottomPrice) *
+                      (quantity.topSlider + quantity.bottomSlider)
+                    }
+                    thousandSeparator={true}
+                    displayType={"text"}
+                    suffix=" vnđ/ngày"
+                    prefix="+ "
+                  />
+                </div>
+              </Col>
               <Col span={24}>
                 <SmallCard
                   name="Bò Thịt"
                   price={topPrice}
-                  subTotal={quantity * topPrice}
+                  subTotal={quantity.topSlider * topPrice}
                 />
               </Col>
               <Col span={24}>
                 <SmallCard
                   name="Bò Nái"
                   price={bottomPrice}
-                  subTotal={quantity * bottomPrice}
+                  subTotal={quantity.bottomSlider * bottomPrice}
                 />
               </Col>
             </Row>
