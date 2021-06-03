@@ -5,7 +5,13 @@ import "./CommonButton.Style.less";
 
 const CommonButton = ({ title, href }) => {
   return (
-    <Link spy={true} smooth={true} to={href} className="button-wrapper">
+    <Link
+      hashSpy={true}
+      spy={true}
+      smooth={true}
+      to={href}
+      className="button-wrapper"
+    >
       {title}
     </Link>
   );

@@ -4,13 +4,6 @@ import "antd/dist/antd.css";
 
 import "./SliderRange.Style.less";
 import { COLORS } from "Constants/CommonConstants";
-window.addEventListener(
-  "touchmove",
-  function (event) {
-    event.preventDefault();
-  },
-  { passive: false }
-);
 
 const marks = {
   100: "100 con",
