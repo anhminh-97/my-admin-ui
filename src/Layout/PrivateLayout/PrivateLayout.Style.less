@@ -1,0 +1,30 @@
+@import "~antd/lib/style/themes/default.less";
+.private-layout-wrapper {
+  height: auto;
+  .btn-dashboard {
+    border: none;
+    padding: 0;
+    &:hover {
+      background-color: transparent;
+      color: @black;
+    }
+  }
+  .logo {
+    letter-spacing: 4px;
+    font-weight: 700;
+    font-size: 24px;
+    color: white;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    margin: @margin-sm 0;
+  }
+  .site-layout-background {
+    padding: 0 40px;
+    background-color: @white;
+  }
+  .breadcrumb {
+    margin-top: @margin-lg;
+    margin-left: @margin-md;
+  }
+}
