@@ -1,6 +1,6 @@
 import { Line } from "@ant-design/charts";
 import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
-import { Card, Col, Row, Table, Tag } from "antd";
+import { Card, Col, Progress, Row, Table, Tag } from "antd";
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.Style.less";
@@ -57,13 +57,13 @@ const Dashboard = () => {
       dataIndex: "tags",
       render: (tags) => (
         <>
-          {tags.map((tag) => {
+          {tags.map((tag, index) => {
             let color = tag.length > 5 ? "geekblue" : "green";
             if (tag === "loser") {
               color = "volcano";
             }
             return (
-              <Tag color={color} key={tag}>
+              <Tag color={color} key={index}>
                 {tag.toUpperCase()}
               </Tag>
             );
@@ -96,10 +96,11 @@ const Dashboard = () => {
         <Col span={6}>
           <Card hoverable title="Total">
             <Row>
-              <Col span={24}>
-                <h1 style={{ fontSize: "30px" }}>2,781</h1>
+              <Col span={12}>
+                <Progress width={80} type="circle" percent={100} />
               </Col>
               <Col span={12}>
+                <h1 style={{ fontSize: "30px" }}>2,781</h1>
                 12% <CaretUpOutlined style={{ color: "green" }} />
               </Col>
             </Row>
@@ -108,10 +109,11 @@ const Dashboard = () => {
         <Col span={6}>
           <Card hoverable title="Total">
             <Row>
-              <Col span={24}>
-                <h1 style={{ fontSize: "30px" }}>3,241</h1>
+              <Col span={12}>
+                <Progress width={80} type="circle" percent={20} status="exception" />
               </Col>
               <Col span={12}>
+                <h1 style={{ fontSize: "30px" }}>3,241</h1>
                 11% <CaretDownOutlined style={{ color: "red" }} />
               </Col>
             </Row>
@@ -120,10 +122,11 @@ const Dashboard = () => {
         <Col span={6}>
           <Card hoverable title="Total">
             <Row>
-              <Col span={24}>
-                <h1 style={{ fontSize: "30px" }}>253</h1>
+              <Col span={12}>
+                <Progress width={80} type="circle" percent={40} />
               </Col>
               <Col span={12}>
+                <h1 style={{ fontSize: "30px" }}>253</h1>
                 12% <CaretUpOutlined style={{ color: "green" }} />
               </Col>
             </Row>
@@ -132,10 +135,11 @@ const Dashboard = () => {
         <Col span={6}>
           <Card hoverable title="Total">
             <Row>
-              <Col span={24}>
-                <h1 style={{ fontSize: "30px" }}>4,324</h1>
+              <Col span={12}>
+                <Progress width={80} type="circle" percent={75} />
               </Col>
               <Col span={12}>
+                <h1 style={{ fontSize: "30px" }}>4,324</h1>
                 11% <CaretDownOutlined style={{ color: "red" }} />
               </Col>
             </Row>
@@ -148,11 +152,7 @@ const Dashboard = () => {
         </Col>
         <Col span={6}>
           <Card hoverable>
-            <Table
-              columns={columns}
-              dataSource={dataTable}
-              pagination={false}
-            />
+            <Table columns={columns} dataSource={dataTable} pagination={false} />
           </Card>
         </Col>
       </Row>

@@ -9,4 +9,5 @@ export const ROUTER = {
   Dashboard: "/dashboard",
   ProductAdmin: "/product-admin",
   CategoryAdmin: "/category-admin",
+  AddProduct: "/add-product",
 };

@@ -7,7 +7,6 @@ import {
   MenuUnfoldOutlined,
   ProfileOutlined,
   PushpinOutlined,
-  SettingOutlined,
   ShoppingCartOutlined,
   UserOutlined,
   DashboardOutlined,
@@ -41,13 +40,7 @@ const PrivateLayout = ({ children, icon, label }) => {
           {collapsed ? <HomeOutlined className="home-icon" /> : "MY ADMIN"}
         </Link>
 
-        <Menu
-          theme="dark"
-          mode="inline"
-          // defaultSelectedKeys={['1']}
-          // defaultOpenKeys={['product']}
-          // style={{ height: '100%', borderRight: 0 }}
-        >
+        <Menu theme="dark" mode="inline">
           <Menu.Item key="all-orders" icon={<DashboardOutlined />}>
             <Link to={ROUTER.Dashboard}>Dashboard</Link>
           </Menu.Item>
@@ -64,11 +57,7 @@ const PrivateLayout = ({ children, icon, label }) => {
             <Menu.Item key="10">Add new</Menu.Item>
             <Menu.Item key="11">Category</Menu.Item>
           </SubMenu>
-          <SubMenu
-            key="products"
-            icon={<ShoppingCartOutlined />}
-            title="Products"
-          >
+          <SubMenu key="products" icon={<ShoppingCartOutlined />} title="Products">
             <Menu.Item key="allProducts">
               <Link to={ROUTER.ProductAdmin}>All Products</Link>
             </Menu.Item>
@@ -78,18 +67,6 @@ const PrivateLayout = ({ children, icon, label }) => {
             <Menu.Item key="category">
               <Link to={ROUTER.CategoryAdmin}>Category</Link>
             </Menu.Item>
-          </SubMenu>
-          {/* <Menu.Item key="all-orders" icon={<FormOutlined />}>
-            <Link to={ROUTER.AllOrders}>
-              Orders
-              <Badge size="small" offset={[10, 0]} />
-            </Link>
-          </Menu.Item> */}
-          <SubMenu key="setting" title="Setting" icon={<SettingOutlined />}>
-            <Menu.Item key="9">option9</Menu.Item>
-            <Menu.Item key="10">option10</Menu.Item>
-            <Menu.Item key="11">option11</Menu.Item>
-            <Menu.Item key="12">option12</Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>
@@ -108,7 +85,7 @@ const PrivateLayout = ({ children, icon, label }) => {
                 overlay={
                   <Menu>
                     <Menu.Item>
-                      <Link to={ROUTER.Profile}>
+                      <Link to="">
                         <ProfileOutlined /> My Profile
                       </Link>
                     </Menu.Item>
@@ -118,16 +95,8 @@ const PrivateLayout = ({ children, icon, label }) => {
                   </Menu>
                 }
               >
-                <Link
-                  to=""
-                  className="ant-dropdown-link login"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Avatar
-                    size="small"
-                    className="avatar"
-                    icon={<UserOutlined />}
-                  />
+                <Link to="" className="ant-dropdown-link login" onClick={(e) => e.preventDefault()}>
+                  <Avatar size="small" className="avatar" icon={<UserOutlined />} />
                   &ensp;
                 </Link>
               </Dropdown>
@@ -142,7 +111,7 @@ const PrivateLayout = ({ children, icon, label }) => {
               </Breadcrumb.Item>
               {icon && label ? (
                 <Breadcrumb.Item>
-                  <Link to={`/${label}`.toLowerCase}>
+                  <Link to="">
                     {icon} <span>{label}</span>
                   </Link>
                 </Breadcrumb.Item>

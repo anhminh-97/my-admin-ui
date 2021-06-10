@@ -1,6 +1,6 @@
 import React from "react";
-import { Layout } from "Components/UI-Library";
-import "./index.less";
+import { Layout } from "antd";
+// import "./index.less";
 
 const { Content } = Layout;
 
