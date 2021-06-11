@@ -42,6 +42,9 @@ const CategorySlice = createSlice({
     [addCategory.fulfilled]: (state, action) => {
       state.allCategories = [action.payload, ...state.allCategories];
     },
+    [updateCategory.pending]: (state) => {
+      state.loading = true;
+    },
     [updateCategory.fulfilled]: (state, action) => {
       state.allCategories = state.allCategories.map((item) => {
         if (item.id === action.payload.id) {
@@ -51,6 +54,10 @@ const CategorySlice = createSlice({
           };
         } else return item;
       });
+      state.loading = false;
+    },
+    [updateCategory.rejected]: (state, action) => {
+      state.loading = false;
     },
     [deleteCategory.pending]: (state) => {
       state.loading = true;

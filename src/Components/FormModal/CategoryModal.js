@@ -1,4 +1,4 @@
-import { DatePicker, Form, Input, message, Modal } from "antd";
+import { Col, DatePicker, Form, Input, message, Modal, Row } from "antd";
 import moment from "moment";
 import React from "react";
 
@@ -8,7 +8,7 @@ const CategoryModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   return (
     <Modal
       visible={visible}
-      title="Create a new collection"
+      title={editMode ? "Edit category" : "Create a new product"}
       okText={editMode ? "Update" : "Create"}
       cancelText="Cancel"
       onCancel={onCancel}
@@ -46,12 +46,20 @@ const CategoryModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Created At:">
-          <DatePicker defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
-        </Form.Item>
-        <Form.Item label="Updated At:">
-          <DatePicker defaultValue={moment(data.updateAt)} format="DD/MM/YYYY" />
-        </Form.Item>
+        {editMode && (
+          <Row gutter={24}>
+            <Col>
+              <Form.Item label="Created At:">
+                <DatePicker defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item label="Updated At:">
+                <DatePicker defaultValue={moment(data.updateAt)} format="DD/MM/YYYY" />
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
       </Form>
     </Modal>
   );

@@ -1,6 +1,7 @@
 import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select } from "antd";
 import moment from "moment";
-import React, { useState, useMemo } from "react";
+import isEmpty from "lodash/isEmpty";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const { Option } = Select;
@@ -9,21 +10,29 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
   const allCategories = useSelector((state) => state.category.allCategories);
 
-  const [value, setValue] = useState("");
+  const [category, setCategory] = useState({
+    name: "",
+    id: isEmpty(data) ? null : data.categoryId,
+  });
+  // const results = isEmpty(data)
+  // console.log('isEmty :>> ', results);
 
   const handleSelect = (values) => {
-    setValue(values);
+    setCategory(values);
   };
-  const defaultValue = useMemo(() => {
-    return data.name
-      ? // eslint-disable-next-line array-callback-return
-        allCategories.map((item) => {
-          if (item.id === data.id) {
-            return item.name;
-          }
-        })
-      : value;
-  }, [allCategories, data, value]);
+  useEffect(() => {
+    if (isEmpty(category)) {
+      setCategory(
+        isEmpty(data)
+          ? allCategories
+              .filter((item) => item.id === data.categoryId)
+              .map((item) => {
+                return { ...category, name: item.name, id: item.id };
+              })
+          : category
+      );
+    }
+  }, [allCategories, data.categoryId, data.id, data, category]);
   return (
     <Modal
       visible={visible}
@@ -35,8 +44,9 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         form
           .validateFields()
           .then((values) => {
+            const value = { ...values, categoryId: category.id };
             form.resetFields();
-            onCreate(values);
+            onCreate(value);
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -91,7 +101,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
               {allCategories && (
                 <Select
                   placeholder="Select a category"
-                  value={defaultValue}
+                  value={category.name}
                   style={{ width: 120 }}
                   onChange={handleSelect}
                 >

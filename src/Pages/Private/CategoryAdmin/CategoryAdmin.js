@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, message, Popconfirm, Row, Select, Space, Spin, Table } from "antd";
+import { Button, Col, message, Popconfirm, Row, Space, Spin, Table } from "antd";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 
 import useGetCategory from "Hooks/CategoryHook";
-import { deleteCategory } from "Features/Category/CategorySlice";
+import { addCategory, deleteCategory, updateCategory } from "Features/Category/CategorySlice";
 import "./CategoryAdmin.Style.less";
 import { CategoryModal } from "Components/FormModal";
+import { getAllProducts } from "Features/Product/ProductSlice";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const CategoryAdmin = () => {
   const dispatch = useDispatch();
@@ -21,9 +22,7 @@ const CategoryAdmin = () => {
   // State
   const [data, setData] = useState({});
   const [visible, setVisible] = useState(false);
-  const [query, setQuery] = useState({
-    color: 0,
-  });
+  const [editMode, setEditMode] = useState(false);
 
   // useEffect
   useGetCategory();
@@ -32,18 +31,45 @@ const CategoryAdmin = () => {
   const showModal = (value) => {
     setData(value);
     setVisible(true);
+    setEditMode(true);
   };
   const onConfirm = (id) => {
-    dispatch(deleteCategory({ id, mesDelete }));
+    dispatch(deleteCategory({ id, mesResult }));
   };
-  const mesDelete = (success) => {
+  const onCancel = () => {
+    setVisible(false);
+    setEditMode(false);
+    setData({});
+  };
+
+  const mesResult = (success) => {
     if (success) {
-      message.success("Delete successfully");
+      message.success("Successfully");
     } else {
-      message.error("Delete failed");
+      message.error("Failed");
     }
   };
-  const handleSelect = () => {};
+
+  const onHandleCreate = async (value) => {
+    setVisible(false);
+    setData({});
+    await dispatch(addCategory({ value, mesResult }));
+    dispatch(getAllProducts());
+  };
+
+  const onHandleUpdate = async (value) => {
+    const updatedValue = {
+      ...data,
+      name: value.name,
+      description: value.description,
+      color: value.color,
+      price: value.price,
+    };
+    setVisible(false);
+    setData({});
+    await dispatch(updateCategory({ updatedValue, mesResult }));
+    dispatch(getAllProducts());
+  };
 
   const columns = [
     {
@@ -84,27 +110,29 @@ const CategoryAdmin = () => {
 
   return (
     <div className="category-admin-wrapper">
-      <Spin align="end" spinning={loading} tip="Loading..." className="spin-loading">
-        <Row justify="end">
+      <Spin spinning={loading} tip="Loading..." className="spin-loading">
+        <Row justify="space-between">
           <Col>
-            <Button type="primary">
+            <Button onClick={() => setVisible(true)} type="primary">
               <PlusOutlined /> Add new
             </Button>
           </Col>
+          <Col>
+            <Space style={{ marginBottom: 16 }}>
+              <Button>Sort age</Button>
+              <Button>Clear</Button>
+              <Button type="primary">Filter</Button>
+            </Space>
+          </Col>
         </Row>
-        <br />
-        <Space  style={{ marginBottom: 16 }}>
-          <Button>Sort age</Button>
-          <Button>Clear</Button>
-          <Button type="primary">Filter</Button>
-        </Space>
         <Table dataSource={allCategories} columns={columns} />
         {visible && (
           <CategoryModal
-            editMode
+            editMode={editMode}
             data={data}
             visible={visible}
-            onCancel={() => setVisible(false)}
+            onCancel={onCancel}
+            onCreate={editMode ? onHandleUpdate : onHandleCreate}
           />
         )}
       </Spin>

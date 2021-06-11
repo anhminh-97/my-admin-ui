@@ -61,9 +61,6 @@ const PrivateLayout = ({ children, icon, label }) => {
             <Menu.Item key="allProducts">
               <Link to={ROUTER.ProductAdmin}>All Products</Link>
             </Menu.Item>
-            <Menu.Item key="addProduct">
-              <Link to={ROUTER.AddProduct}>Add new</Link>
-            </Menu.Item>
             <Menu.Item key="category">
               <Link to={ROUTER.CategoryAdmin}>Category</Link>
             </Menu.Item>

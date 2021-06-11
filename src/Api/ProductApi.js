@@ -21,14 +21,6 @@ const ProductApi = {
     const url = `/products/${id}`;
     return AxiosClient.delete(url);
   },
-  getPagination(params) {
-    const url = `/products/${params}`;
-    return AxiosClient.get(url, { params });
-  },
-  sortBy(params) {
-    const url = `/products/${params}`;
-    return AxiosClient.get(url, { params });
-  },
 };
 
 export default ProductApi;

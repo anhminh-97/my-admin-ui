@@ -1,5 +1,17 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, message, Popconfirm, Row, Select, Space, Spin, Table } from "antd";
+import {
+  Button,
+  Col,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Input,
+  Slider,
+} from "antd";
 import { ProductModal } from "Components/FormModal";
 import {
   addProduct,
@@ -8,12 +20,12 @@ import {
   updateProduct,
 } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
-import useGetProduct from "Hooks/ProductHook";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./ProductAdmin.Style.less";
 
+const { Search } = Input;
 const { Option } = Select;
 
 const ProductAdmin = () => {
@@ -21,17 +33,22 @@ const ProductAdmin = () => {
   // Redux
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
+  const total = useSelector((state) => state.product.total);
   const allCategories = useSelector((state) => state.category.allCategories);
 
   // useState
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
-
-  // const [product, setProduct] = useState();
+  const [filter, setFilter] = useState({
+    _page: 1,
+    _limit: 10,
+  });
 
   // useEffect
-  useGetProduct();
+  useEffect(() => {
+    dispatch(getAllProducts(filter));
+  }, [filter, dispatch]);
   useGetCategory();
 
   // Function
@@ -60,7 +77,7 @@ const ProductAdmin = () => {
     setVisible(false);
     setData({});
     await dispatch(addProduct({ value, mesResult }));
-    dispatch(getAllProducts());
+    dispatch(getAllProducts(filter));
   };
 
   const onHandleUpdate = async (value) => {
@@ -70,13 +87,26 @@ const ProductAdmin = () => {
       description: value.description,
       color: value.color,
       price: value.price,
+      categoryID: value.categoryID,
     };
     setVisible(false);
     setData({});
+    setEditMode(false);
     await dispatch(updateProduct({ updatedValue, mesResult }));
-    dispatch(getAllProducts());
+    dispatch(getAllProducts(filter));
   };
-  const handleSelect = () => {};
+  const handleSelect = (value) => {
+    setFilter((prev) => ({ ...prev, _sort: "price", _order: value }));
+  };
+  const onHandleSearch = (value) => {
+    setFilter((prev) => ({ ...prev, name_like: value }));
+  };
+  const handlePagination = (pagination) => {
+    setFilter((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
+  };
+  const handleSortPrice = (value) => {
+    setFilter((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
+  };
 
   const columns = [
     {
@@ -104,12 +134,11 @@ const ProductAdmin = () => {
       dataIndex: "categoryId",
       key: "categoryId",
       render: (id) =>
-        // eslint-disable-next-line array-callback-return
-        allCategories.map((item) => {
-          if (item.id === id) {
+        allCategories
+          .filter((item) => item.id === id)
+          .map((item) => {
             return item.name;
-          }
-        }),
+          }),
     },
     {
       title: "Create At",
@@ -154,24 +183,26 @@ const ProductAdmin = () => {
               <PlusOutlined /> Add new
             </Button>
           </Col>
+          <Col span={6}>
+            <Slider marks={{ 0: "0", 1000: "1000" }} range max={1000} onChange={handleSortPrice} />
+          </Col>
           <Col>
             <Space style={{ marginBottom: 16 }}>
-              <Select defaultValue="Color" style={{ width: 120 }} onChange={handleSelect}>
-                {allProducts.map((item) => {
-                  return (
-                    <Option key={item.id} value={item.color}>
-                      {item.color}
-                    </Option>
-                  );
-                })}
+              <Select defaultValue="Order" style={{ width: 120 }} onChange={handleSelect}>
+                <Option value="asc">ASC</Option>
+                <Option value="desc">DESC</Option>
               </Select>
-              <Button>Sort age</Button>
-              <Button>Clear</Button>
-              <Button type="primary">Filter</Button>
+              <Search placeholder="Search..." onSearch={onHandleSearch} enterButton />
             </Space>
           </Col>
         </Row>
-        <Table scroll={{ x: 700, y: 500 }} dataSource={allProducts} columns={columns} />
+        <Table
+          scroll={{ x: 700, y: 500 }}
+          dataSource={allProducts}
+          columns={columns}
+          onChange={handlePagination}
+          pagination={{ total: `${total}` }}
+        />
         {visible && (
           <ProductModal
             visible={visible}
