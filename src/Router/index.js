@@ -3,14 +3,14 @@ import { BrowserRouter as Router, Switch } from "react-router-dom";
 
 import { ROUTER } from "../Constants/CommonConstants";
 import PrivateRoute from "./Private.Route";
+import PublicRoute from "./Public.Route";
 import { AddProduct, CategoryAdmin, Dashboard, Home, ProductAdmin } from "Pages";
-import PublicLayout from "Layout/PublicLayout";
 
 const Routes = () => {
   return (
     <Router>
       <Switch>
-        <PublicLayout path={ROUTER.Home} exact component={Home} />
+        <PublicRoute path={ROUTER.Home} exact component={Home} />
         <PrivateRoute path={ROUTER.Dashboard} exact component={Dashboard} />
         <PrivateRoute path={ROUTER.ProductAdmin} exact component={ProductAdmin} />
         <PrivateRoute path={ROUTER.CategoryAdmin} exact component={CategoryAdmin} />

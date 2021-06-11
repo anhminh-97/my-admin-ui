@@ -1,6 +1,6 @@
 import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select } from "antd";
 import moment from "moment";
-import React, { useState ,useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 const { Option } = Select;
@@ -9,14 +9,21 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
   const allCategories = useSelector((state) => state.category.allCategories);
 
-  const [value, setValue] = useState(null);
-  console.log("🚀 ~ file: ProductModal.js ~ line 14 ~ ProductModal ~ value", value)
+  const [value, setValue] = useState("");
 
   const handleSelect = (values) => {
-    console.log("values :>>",`0${values}0`);
     setValue(values);
   };
-
+  const defaultValue = useMemo(() => {
+    return data.name
+      ? // eslint-disable-next-line array-callback-return
+        allCategories.map((item) => {
+          if (item.id === data.id) {
+            return item.name;
+          }
+        })
+      : value;
+  }, [allCategories, data, value]);
   return (
     <Modal
       visible={visible}
@@ -76,36 +83,28 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
                 },
               ]}
             >
-              <InputNumber />
+              <InputNumber min={0} />
             </Form.Item>
           </Col>
           <Col>
-          {value}
-            {/* <Form.Item label="Category:"> */}
-              <Select
-                placeholder="Select a category"
-                value={
-                  data
-                    ? // eslint-disable-next-line array-callback-return
-                      allCategories.map((item)  => {
-                        if (item.id === data.id) {
-                          return item.name;
-                        }
-                      })
-                    : value
-                }
-                style={{ width: 120 }}
-                onChange={handleSelect}
-              >
-                {allCategories.map((item, key) => {
-                  return (
-                    <Option value={item.name} key={key}>
-                      {item.color}
-                    </Option>
-                  );
-                })}
-              </Select>
-            {/* </Form.Item> */}
+            <Form.Item label="Category:">
+              {allCategories && (
+                <Select
+                  placeholder="Select a category"
+                  value={defaultValue}
+                  style={{ width: 120 }}
+                  onChange={handleSelect}
+                >
+                  {allCategories.map((item, key) => {
+                    return (
+                      <Option value={item.name} key={key.toString()}>
+                        {item.name}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              )}
+            </Form.Item>
           </Col>
         </Row>
         <Form.Item name="description" label="Description:">
@@ -115,12 +114,12 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           <Row gutter={24}>
             <Col>
               <Form.Item label="Created At:">
-                <DatePicker defaultValue={data & moment(data.createdAt)} format="DD/MM/YYYY" />
+                <DatePicker defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
             <Col>
               <Form.Item label="Updated At:">
-                <DatePicker defaultValue={data && moment(data.updateAt)} format="DD/MM/YYYY" />
+                <DatePicker defaultValue={moment(data.updateAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
           </Row>

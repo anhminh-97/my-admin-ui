@@ -1,7 +1,12 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, message, Popconfirm, Row, Select, Space, Spin, Table } from "antd";
 import { ProductModal } from "Components/FormModal";
-import { addProduct, deleteProduct } from "Features/Product/ProductSlice";
+import {
+  addProduct,
+  deleteProduct,
+  getAllProducts,
+  updateProduct,
+} from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
 import useGetProduct from "Hooks/ProductHook";
 import moment from "moment";
@@ -36,35 +41,41 @@ const ProductAdmin = () => {
     setVisible(true);
   };
   const onConfirm = (id) => {
-    dispatch(deleteProduct(id));
+    dispatch(deleteProduct({ id, mesResult }));
   };
   const onCancel = () => {
     setVisible(false);
     setEditMode(false);
     setData({});
   };
-  // const mesDelete = (success) => {
-  //   if (success) {
-  //     message.success("Delete successfully");
-  //   } else {
-  //     message.error("Delete failed");
-  //   }
-  // };
-  // const mesCreate = (success) => {
-  //   if (success) {
-  //     message.success("Create successfully");
-  //   } else {
-  //     message.error("Create failed");
-  //   }
-  // };
-
-  const onHandleCreate = (value) => {
-    dispatch(addProduct(value));
-    setVisible(false);
-    setData({});
+  const mesResult = (success) => {
+    if (success) {
+      message.success("Successfully");
+    } else {
+      message.error("Failed");
+    }
   };
 
-  const onHandleEdit = (value) => {};
+  const onHandleCreate = async (value) => {
+    setVisible(false);
+    setData({});
+    await dispatch(addProduct({ value, mesResult }));
+    dispatch(getAllProducts());
+  };
+
+  const onHandleUpdate = async (value) => {
+    const updatedValue = {
+      ...data,
+      name: value.name,
+      description: value.description,
+      color: value.color,
+      price: value.price,
+    };
+    setVisible(false);
+    setData({});
+    await dispatch(updateProduct({ updatedValue, mesResult }));
+    dispatch(getAllProducts());
+  };
   const handleSelect = () => {};
 
   const columns = [
@@ -121,7 +132,9 @@ const ProductAdmin = () => {
           <EditOutlined onClick={() => showModal(record)} />
           <Popconfirm
             title="Are you sure to delete this product?"
-            onConfirm={() => onConfirm(record.id)}
+            onConfirm={() => {
+              onConfirm(record.id);
+            }}
             okText="Yes"
             cancelText="No"
           >
@@ -158,12 +171,12 @@ const ProductAdmin = () => {
             </Space>
           </Col>
         </Row>
-        <Table dataSource={allProducts} columns={columns} />
+        <Table scroll={{ x: 700, y: 500 }} dataSource={allProducts} columns={columns} />
         {visible && (
           <ProductModal
             visible={visible}
             onCancel={onCancel}
-            onCreate={editMode ? onHandleEdit : onHandleCreate}
+            onCreate={editMode ? onHandleUpdate : onHandleCreate}
             data={data}
             editMode={editMode}
           />
