@@ -1,5 +1,5 @@
 {
-  "name": "farm-costs",
+  "name": "my-admin-ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,6 +13,7 @@
     "antd": "^4.16.0",
     "axios": "^0.21.1",
     "craco-less": "^1.17.1",
+    "env-cmd": "^10.1.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "react": "^17.0.2",
@@ -22,12 +23,13 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-scroll": "^1.8.2",
+    "redux-persist": "^6.0.0",
     "tslib": "^2.2.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build:staging": "env-cmd -f .env.staging craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
