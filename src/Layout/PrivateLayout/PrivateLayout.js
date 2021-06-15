@@ -1,6 +1,6 @@
-import { Avatar, Breadcrumb, Col, Dropdown, Layout, Menu, Row } from "antd";
 import {
   CopyOutlined,
+  DashboardOutlined,
   HomeOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -9,10 +9,13 @@ import {
   PushpinOutlined,
   ShoppingCartOutlined,
   UserOutlined,
-  DashboardOutlined,
 } from "@ant-design/icons";
+import { Avatar, Breadcrumb, Col, Dropdown, Layout, Menu, Row } from "antd";
 import { ROUTER } from "Constants/CommonConstants";
-import React, { useState } from "react";
+import { logout } from "Features/Auth/UserSlice";
+import isEmpty from "lodash/isEmpty";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import "./PrivateLayout.Style.less";
 
@@ -20,9 +23,16 @@ const { SubMenu } = Menu;
 const { Header, Sider, Content } = Layout;
 
 const PrivateLayout = ({ children, icon, label }) => {
+  const dispatch = useDispatch();
   const history = useHistory();
   // Redux
+  const user = useSelector((state) => state.user.current);
 
+  useEffect(() => {
+    if (isEmpty(user)) {
+      history.push(ROUTER.Login);
+    }
+  }, [history, user]);
   // State
   const [collapsed, setCollapsed] = useState(false);
 
@@ -31,7 +41,8 @@ const PrivateLayout = ({ children, icon, label }) => {
     setCollapsed(!collapsed);
   };
   const handleLogout = () => {
-    // removeUser();
+    dispatch(logout());
+    history.push(ROUTER.Login);
   };
   return (
     <Layout className="private-layout-wrapper">
@@ -94,7 +105,7 @@ const PrivateLayout = ({ children, icon, label }) => {
               >
                 <Link to="" className="ant-dropdown-link login" onClick={(e) => e.preventDefault()}>
                   <Avatar size="small" className="avatar" icon={<UserOutlined />} />
-                  &ensp;
+                  &ensp; {!isEmpty(user) && user.email}
                 </Link>
               </Dropdown>
             </Col>

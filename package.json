@@ -23,13 +23,12 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-scroll": "^1.8.2",
-    "redux-persist": "^6.0.0",
     "tslib": "^2.2.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
     "start": "craco start",
-    "build:staging": "env-cmd -f .env.staging craco build",
+    "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
