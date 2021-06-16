@@ -7,29 +7,26 @@ export const getAllProducts = createAsyncThunk("product/getAllProducts", async (
 });
 
 export const addProduct = createAsyncThunk("product/addProduct", async (data) => {
-  await ProductApi.add(data.value);
+  await ProductApi.add(data);
   return data;
 });
 
 export const updateProduct = createAsyncThunk("product/updateProduct", async (data) => {
-  await ProductApi.update(data.updatedValue);
+  await ProductApi.update(data);
   return data;
 });
 
-export const deleteProduct = createAsyncThunk(
-  "product/deleteProduct",
-  async ({ id, mesResult }) => {
-    await ProductApi.delete(id);
-    return { id, mesResult };
-  }
-);
+export const deleteProduct = createAsyncThunk("product/deleteProduct", async (id) => {
+  await ProductApi.delete(id);
+  return id;
+});
 
 const ProductSlice = createSlice({
   name: "product",
   initialState: { allProducts: [], loading: false, total: 0 },
   reducers: {},
   extraReducers: {
-    [getAllProducts.pending]: (state, action) => {
+    [getAllProducts.pending]: (state) => {
       state.loading = true;
     },
     [getAllProducts.fulfilled]: (state, action) => {
@@ -37,19 +34,19 @@ const ProductSlice = createSlice({
       state.total = action.payload.pagination._totalRows;
       state.loading = false;
     },
-    [getAllProducts.rejected]: (state, action) => {
+    [getAllProducts.rejected]: (state) => {
       state.loading = false;
     },
     [addProduct.pending]: (state) => {
       state.loading = true;
     },
     [addProduct.fulfilled]: (state, action) => {
-      state.allProducts = [action.payload.value, ...state.allProducts];
-      action.payload.mesResult(true);
+      state.allProducts = [action.payload, ...state.allProducts];
+      // action.payload.mesResult(true);
       state.loading = false;
     },
-    [addProduct.rejected]: (state, action) => {
-      action.payload.mesResult(false);
+    [addProduct.rejected]: (state) => {
+      // action.payload.mesResult(false);
       state.loading = false;
     },
     [updateProduct.pending]: (state) => {
@@ -63,24 +60,24 @@ const ProductSlice = createSlice({
       //     return UpdatedData;
       //   } else return item;
       // });
-      action.payload.mesResult(true);
+      // action.payload.mesResult(true);
       state.loading = false;
     },
-    [updateProduct.rejected]: (state, action) => {
+    [updateProduct.rejected]: (state) => {
       state.loading = false;
-      action.payload.mesResult(false);
+      // action.payload.mesResult(false);
     },
     [deleteProduct.pending]: (state) => {
       state.loading = true;
     },
     [deleteProduct.fulfilled]: (state, action) => {
       state.loading = false;
-      state.allProducts = state.allProducts.filter((item) => item.id !== action.payload.id);
-      action.payload.mesResult(true);
+      state.allProducts = state.allProducts.filter((item) => item.id !== action.payload);
+      // action.payload.mesResult(true);
     },
-    [deleteProduct.rejected]: (state, action) => {
+    [deleteProduct.rejected]: (state) => {
       state.loading = false;
-      action.payload.mesResult(false);
+      // action.payload.mesResult(false);
     },
   },
 });

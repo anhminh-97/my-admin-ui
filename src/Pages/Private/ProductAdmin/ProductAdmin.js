@@ -36,12 +36,7 @@ const ProductAdmin = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   let location = useLocation();
-  // const { search } = useLocation();
-  // console.log("search :>> ", search);
-  // // query params
-  // useEffect(() => {
-  //   setFilter((prev) => ({ ...prev, ...queryString.parse(search) }));
-  // }, [search]);
+
   // Redux
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
@@ -68,10 +63,9 @@ const ProductAdmin = () => {
     } else {
       console.log("ELSE");
       const params = { ...filter, ...parsed };
-      setFilter(params)
+      setFilter(params);
       dispatch(getAllProducts(params));
     }
-    // history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -83,20 +77,18 @@ const ProductAdmin = () => {
     setEditMode(true);
     setVisible(true);
   };
-  const onConfirm = (id) => {
-    dispatch(deleteProduct({ id, mesResult }));
+  const onConfirm = async (id) => {
+    const resultAction = await dispatch(deleteProduct(id));
+    if (resultAction.error) {
+      message.error("Delete Failed");
+    } else {
+      message.success("Delete Successfully");
+    }
   };
   const onCancel = () => {
     setVisible(false);
     setEditMode(false);
     setData({});
-  };
-  const mesResult = (success) => {
-    if (success) {
-      message.success("Successfully");
-    } else {
-      message.error("Failed");
-    }
   };
   const handleClear = () => {
     setFilter({ _page: 1, _limit: 10 });
@@ -106,24 +98,30 @@ const ProductAdmin = () => {
   const onHandleCreate = async (value) => {
     setVisible(false);
     setData({});
-    await dispatch(addProduct({ value, mesResult }));
-    dispatch(getAllProducts(filter));
+    const resultAction = await dispatch(addProduct(value));
+    if (resultAction.error) {
+      message.error("Create Failed");
+    } else {
+      message.success("create Successfully");
+      dispatch(getAllProducts(filter));
+    }
   };
 
   const onHandleUpdate = async (value) => {
     const updatedValue = {
       ...data,
-      name: value.name,
-      description: value.description,
-      color: value.color,
-      price: value.price,
-      categoryID: value.categoryID,
+      ...value,
     };
     setVisible(false);
     setData({});
     setEditMode(false);
-    await dispatch(updateProduct({ updatedValue, mesResult }));
-    dispatch(getAllProducts(filter));
+    const resultAction = await dispatch(updateProduct(updatedValue));
+    if (resultAction.error) {
+      message.error("Update Failed");
+    } else {
+      message.success("Update Successfully");
+      dispatch(getAllProducts(filter));
+    }
   };
   const handleSelect = (value) => {
     setFilter((prev) => ({ ...prev, _sort: "price", _order: value }));
@@ -131,16 +129,15 @@ const ProductAdmin = () => {
   const handleChange = (e) => {
     setFilter((prev) => ({ ...prev, name_like: e.target.value }));
   };
-  const handleFilter = () => {
-    dispatch(getAllProducts(filter));
-    history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
-    // localStorage.setItem("filter", stringified);
-  };
   const handlePagination = (pagination) => {
     setFilter((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
   };
   const handleSortPrice = (value) => {
     setFilter((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
+  };
+  const handleFilter = () => {
+    dispatch(getAllProducts(filter));
+    history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
   };
 
   const columns = [

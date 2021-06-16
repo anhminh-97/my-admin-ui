@@ -20,8 +20,8 @@ const Login = () => {
     if (resultAction.error) {
       message.error(resultAction.error.message);
     } else {
-      history.push(ROUTER.Dashboard);
       message.success("Successfully");
+      history.push(ROUTER.Dashboard);
     }
   };
 

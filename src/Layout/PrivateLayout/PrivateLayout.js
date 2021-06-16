@@ -93,13 +93,9 @@ const PrivateLayout = ({ children, icon, label }) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item>
-                      <Link to="">
-                        <ProfileOutlined /> My Profile
-                      </Link>
-                    </Menu.Item>
-                    <Menu.Item onClick={handleLogout}>
-                      <LogoutOutlined /> Log Out
+                    <Menu.Item icon={<ProfileOutlined />}>My Profile</Menu.Item>
+                    <Menu.Item icon={<LogoutOutlined />} onClick={handleLogout}>
+                      Log Out
                     </Menu.Item>
                   </Menu>
                 }
