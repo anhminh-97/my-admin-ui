@@ -14,5 +14,5 @@ export const ROUTER = {
 };
 export const storageKeys = {
   TOKEN: "access_token",
-  EMAIL: "email",
+  USER: "user",
 };

@@ -27,6 +27,7 @@ const PrivateLayout = ({ children, icon, label }) => {
   const history = useHistory();
   // Redux
   const user = useSelector((state) => state.user.current);
+  // const isLoggedIn = !!user.id
 
   useEffect(() => {
     if (isEmpty(user)) {

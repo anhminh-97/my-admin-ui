@@ -13,6 +13,7 @@ import {
   Slider,
 } from "antd";
 import { ProductModal } from "Components/FormModal";
+import { ROUTER } from "Constants/CommonConstants";
 import {
   addProduct,
   deleteProduct,
@@ -23,13 +24,24 @@ import useGetCategory from "Hooks/CategoryHook";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
+import queryString from "query-string";
+import isEmpty from "lodash";
+
 import "./ProductAdmin.Style.less";
 
-const { Search } = Input;
 const { Option } = Select;
 
 const ProductAdmin = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
+  let location = useLocation();
+  // const { search } = useLocation();
+  // console.log("search :>> ", search);
+  // // query params
+  // useEffect(() => {
+  //   setFilter((prev) => ({ ...prev, ...queryString.parse(search) }));
+  // }, [search]);
   // Redux
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
@@ -40,15 +52,29 @@ const ProductAdmin = () => {
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
+
   const [filter, setFilter] = useState({
     _page: 1,
     _limit: 10,
   });
-
-  // useEffect
+  const parsed = queryString.parse(location.search);
+  const stringified = queryString.stringify(filter);
+  console.log(`location`, location, parsed);
+  // filter
   useEffect(() => {
-    dispatch(getAllProducts(filter));
-  }, [filter, dispatch]);
+    console.log("!isEmty===>", parsed);
+    if (!isEmpty(parsed)) {
+      dispatch(getAllProducts(filter));
+    } else {
+      console.log("ELSE");
+      const params = { ...filter, ...parsed };
+      setFilter(params)
+      dispatch(getAllProducts(params));
+    }
+    // history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useGetCategory();
 
   // Function
@@ -71,6 +97,10 @@ const ProductAdmin = () => {
     } else {
       message.error("Failed");
     }
+  };
+  const handleClear = () => {
+    setFilter({ _page: 1, _limit: 10 });
+    history.push(filter);
   };
 
   const onHandleCreate = async (value) => {
@@ -98,8 +128,13 @@ const ProductAdmin = () => {
   const handleSelect = (value) => {
     setFilter((prev) => ({ ...prev, _sort: "price", _order: value }));
   };
-  const onHandleSearch = (value) => {
-    setFilter((prev) => ({ ...prev, name_like: value }));
+  const handleChange = (e) => {
+    setFilter((prev) => ({ ...prev, name_like: e.target.value }));
+  };
+  const handleFilter = () => {
+    dispatch(getAllProducts(filter));
+    history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
+    // localStorage.setItem("filter", stringified);
   };
   const handlePagination = (pagination) => {
     setFilter((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
@@ -184,20 +219,39 @@ const ProductAdmin = () => {
             </Button>
           </Col>
           <Col span={6}>
-            <Slider marks={{ 0: "0", 1000: "1000" }} range max={1000} onChange={handleSortPrice} />
+            <Slider
+              value={[filter.price_gte, filter.price_lte]}
+              marks={{ 0: "0", 1000: "1000" }}
+              range
+              max={1000}
+              onChange={handleSortPrice}
+            />
           </Col>
           <Col>
             <Space style={{ marginBottom: 16 }}>
-              <Select defaultValue="Order" style={{ width: 120 }} onChange={handleSelect}>
+              <Select
+                value={filter._order}
+                placeholder="Sort"
+                style={{ width: 120 }}
+                onChange={handleSelect}
+              >
                 <Option value="asc">ASC</Option>
                 <Option value="desc">DESC</Option>
               </Select>
-              <Search placeholder="Search..." onSearch={onHandleSearch} enterButton />
+              <Input
+                value={filter.name_like}
+                onChange={handleChange}
+                placeholder="Search..."
+                // onSearch={onHandleSearch}
+              />
+              <Button onClick={handleClear}>Clear</Button>
+              <Button type="primary" onClick={handleFilter}>
+                Filter
+              </Button>
             </Space>
           </Col>
         </Row>
         <Table
-          scroll={{ x: 700, y: 500 }}
           dataSource={allProducts}
           columns={columns}
           onChange={handlePagination}

@@ -12,16 +12,16 @@ const Login = () => {
   const history = useHistory();
 
   const onFinish = async (values) => {
-    try {
-      const value = {
-        email: values.email,
-        password: values.password,
-      };
-      await dispatch(login(value));
+    const value = {
+      identifier: values.identifier,
+      password: values.password,
+    };
+    const resultAction = await dispatch(login(value));
+    if (resultAction.error) {
+      message.error(resultAction.error.message);
+    } else {
       history.push(ROUTER.Dashboard);
       message.success("Successfully");
-    } catch (error) {
-      message.error(error);
     }
   };
 
@@ -40,7 +40,7 @@ const Login = () => {
         >
           <Form.Item
             label="Email"
-            name="email"
+            name="identifier"
             rules={[{ required: true, message: "Please input your username!" }]}
           >
             <Input />
