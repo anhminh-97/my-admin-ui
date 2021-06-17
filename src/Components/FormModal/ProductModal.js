@@ -10,10 +10,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
   const allCategories = useSelector((state) => state.category.allCategories);
 
-  const [category, setCategory] = useState({
-    name: "",
-    id: isEmpty(data) ? null : data.categoryId,
-  });
+  const [category, setCategory] = useState({});
   // const results = isEmpty(data)
   // console.log('isEmty :>> ', results);
 
@@ -23,16 +20,19 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   useEffect(() => {
     if (isEmpty(category)) {
       setCategory(
-        isEmpty(data)
+        !isEmpty(data)
           ? allCategories
               .filter((item) => item.id === data.categoryId)
-              .map((item) => {
+              .map((item, key) => {
+                <span key={key.toString()} />;
                 return { ...category, name: item.name, id: item.id };
               })
           : category
       );
+      console.log("datas", category, data);
     }
   }, [allCategories, data.categoryId, data.id, data, category]);
+
   return (
     <Modal
       visible={visible}
@@ -44,7 +44,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         form
           .validateFields()
           .then((values) => {
-            const value = { ...values, categoryId: category.id };
+            const value = { ...values, categoryId: category[0]?.id };
             form.resetFields();
             onCreate(value);
           })
@@ -53,6 +53,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           });
       }}
     >
+      {console.log("===>", category)}
       <Form
         form={form}
         layout="vertical"
@@ -101,7 +102,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
               {allCategories && (
                 <Select
                   placeholder="Select a category"
-                  value={category.name}
+                  value={category[0]?.name}
                   style={{ width: 120 }}
                   onChange={handleSelect}
                 >

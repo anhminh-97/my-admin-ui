@@ -1,5 +1,5 @@
 import AppLoading from "Components/AppLoading";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import "./App.less";
 import Routes from "./Router";
 

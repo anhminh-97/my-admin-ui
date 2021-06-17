@@ -54,7 +54,7 @@ const ProductAdmin = () => {
   });
   const parsed = queryString.parse(location.search);
   const stringified = queryString.stringify(filter);
-  console.log(`location`, location, parsed);
+  // console.log(`location`, location, parsed);
   // filter
   useEffect(() => {
     console.log("!isEmty===>", parsed);
@@ -130,7 +130,15 @@ const ProductAdmin = () => {
     setFilter((prev) => ({ ...prev, name_like: e.target.value }));
   };
   const handlePagination = (pagination) => {
+    const params = { ...filter, _page: pagination.current, _limit: pagination.pageSize };
+    console.log("params :>> ", params);
+    console.log("pagination :>> ", pagination);
+    const stringifiedParams = queryString.stringify(params);
+
     setFilter((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
+    console.log("filter :>> ", filter);
+    dispatch(getAllProducts(params));
+    history.push({ pathname: ROUTER.ProductAdmin, search: stringifiedParams });
   };
   const handleSortPrice = (value) => {
     setFilter((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
@@ -168,8 +176,8 @@ const ProductAdmin = () => {
       render: (id) =>
         allCategories
           .filter((item) => item.id === id)
-          .map((item) => {
-            return item.name;
+          .map((item, key) => {
+            return <span key={key.toString()}>{item.name}</span>;
           }),
     },
     {
