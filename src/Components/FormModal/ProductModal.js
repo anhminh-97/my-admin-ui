@@ -9,10 +9,9 @@ const { Option } = Select;
 const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
   const allCategories = useSelector((state) => state.category.allCategories);
+  console.log(`allCategories`, allCategories)
 
   const [category, setCategory] = useState({});
-  // const results = isEmpty(data)
-  // console.log('isEmty :>> ', results);
 
   const handleSelect = (values) => {
     setCategory(values);
@@ -23,8 +22,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         !isEmpty(data)
           ? allCategories
               .filter((item) => item.id === data.categoryId)
-              .map((item, key) => {
-                <span key={key.toString()} />;
+              .map((item) => {
                 return { ...category, name: item.name, id: item.id };
               })
           : category

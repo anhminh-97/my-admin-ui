@@ -2,18 +2,17 @@ import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
+  Input,
   message,
   Popconfirm,
   Row,
   Select,
+  Slider,
   Space,
   Spin,
   Table,
-  Input,
-  Slider,
 } from "antd";
 import { ProductModal } from "Components/FormModal";
-import { ROUTER } from "Constants/CommonConstants";
 import {
   addProduct,
   deleteProduct,
@@ -21,13 +20,12 @@ import {
   updateProduct,
 } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
+// import isEmpty from "lodash";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import queryString from "query-string";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
-import queryString from "query-string";
-import isEmpty from "lodash";
-
 import "./ProductAdmin.Style.less";
 
 const { Option } = Select;
@@ -47,27 +45,36 @@ const ProductAdmin = () => {
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
+  const [filters, setFilters] = useState({});
+  const queryParams = useMemo(() => {
+    const params = queryString.parse(location.search);
+    setFilters((prev) => ({ ...prev, ...params }));
+    return {
+      ...params,
+      _page: 1,
+      _limit: 10,
+    };
+  }, [location.search]);
 
-  const [filter, setFilter] = useState({
-    _page: 1,
-    _limit: 10,
-  });
-  const parsed = queryString.parse(location.search);
-  const stringified = queryString.stringify(filter);
+  // const parsed = queryString.parse(location.search);
+  const stringified = queryString.stringify(filters);
   // console.log(`location`, location, parsed);
   // filter
+  // useEffect(() => {
+  //   console.log("!isEmty===>", parsed);
+  //   if (!isEmpty(parsed)) {
+  //     dispatch(getAllProducts(filter));
+  //   } else {
+  //     console.log("ELSE");
+  //     const params = { ...filter, ...parsed };
+  //     setFilter(params);
+  //     dispatch(getAllProducts(params));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
   useEffect(() => {
-    console.log("!isEmty===>", parsed);
-    if (!isEmpty(parsed)) {
-      dispatch(getAllProducts(filter));
-    } else {
-      console.log("ELSE");
-      const params = { ...filter, ...parsed };
-      setFilter(params);
-      dispatch(getAllProducts(params));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dispatch(getAllProducts(queryParams));
+  }, [queryParams, dispatch]);
 
   useGetCategory();
 
@@ -91,8 +98,11 @@ const ProductAdmin = () => {
     setData({});
   };
   const handleClear = () => {
-    setFilter({ _page: 1, _limit: 10 });
-    history.push(filter);
+    setFilters({ _page: 1, _limit: 10 });
+    history.push({
+      pathname: history.location.pathname,
+      search: queryString.stringify({ _page: 1, _limit: 10 }),
+    });
   };
 
   const onHandleCreate = async (value) => {
@@ -103,7 +113,7 @@ const ProductAdmin = () => {
       message.error("Create Failed");
     } else {
       message.success("create Successfully");
-      dispatch(getAllProducts(filter));
+      dispatch(getAllProducts(queryParams));
     }
   };
 
@@ -120,32 +130,27 @@ const ProductAdmin = () => {
       message.error("Update Failed");
     } else {
       message.success("Update Successfully");
-      dispatch(getAllProducts(filter));
+      dispatch(getAllProducts(queryParams));
     }
   };
   const handleSelect = (value) => {
-    setFilter((prev) => ({ ...prev, _sort: "price", _order: value }));
+    setFilters((prev) => ({ ...prev, _sort: "price", _order: value }));
   };
-  const handleChange = (e) => {
-    setFilter((prev) => ({ ...prev, name_like: e.target.value }));
+  const handleSearch = (e) => {
+    setFilters((prev) => ({ ...prev, name_like: e.target.value }));
   };
   const handlePagination = (pagination) => {
-    const params = { ...filter, _page: pagination.current, _limit: pagination.pageSize };
-    console.log("params :>> ", params);
-    console.log("pagination :>> ", pagination);
+    const params = { ...queryParams, _page: pagination.current, _limit: pagination.pageSize };
     const stringifiedParams = queryString.stringify(params);
-
-    setFilter((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
-    console.log("filter :>> ", filter);
     dispatch(getAllProducts(params));
-    history.push({ pathname: ROUTER.ProductAdmin, search: stringifiedParams });
+    history.push({ pathname: history.location.pathname, search: stringifiedParams });
   };
   const handleSortPrice = (value) => {
-    setFilter((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
+    setFilters((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
   };
   const handleFilter = () => {
-    dispatch(getAllProducts(filter));
-    history.push({ pathname: ROUTER.ProductAdmin, search: stringified });
+    history.push({ pathname: history.location.pathname, search: stringified });
+    dispatch(getAllProducts(queryParams));
   };
 
   const columns = [
@@ -213,7 +218,6 @@ const ProductAdmin = () => {
       ),
     },
   ];
-
   return (
     <div className="product-admin-wrapper">
       <Spin spinning={loading} tip="Loading..." className="spin-loading">
@@ -225,7 +229,7 @@ const ProductAdmin = () => {
           </Col>
           <Col span={6}>
             <Slider
-              value={[filter.price_gte, filter.price_lte]}
+              value={[filters.price_gte, filters.price_lte]}
               marks={{ 0: "0", 1000: "1000" }}
               range
               max={1000}
@@ -235,7 +239,7 @@ const ProductAdmin = () => {
           <Col>
             <Space style={{ marginBottom: 16 }}>
               <Select
-                value={filter._order}
+                value={filters._order}
                 placeholder="Sort"
                 style={{ width: 120 }}
                 onChange={handleSelect}
@@ -244,8 +248,8 @@ const ProductAdmin = () => {
                 <Option value="desc">DESC</Option>
               </Select>
               <Input
-                value={filter.name_like}
-                onChange={handleChange}
+                value={filters.name_like}
+                onChange={handleSearch}
                 placeholder="Search..."
                 // onSearch={onHandleSearch}
               />
@@ -260,7 +264,12 @@ const ProductAdmin = () => {
           dataSource={allProducts}
           columns={columns}
           onChange={handlePagination}
-          pagination={{ total: `${total}` }}
+          pagination={{
+            total: `${total}`,
+            current: `${filters._page}`,
+            showSizeChanger: true,
+            showTotal: (total) => `Total: ${total}`,
+          }}
         />
         {visible && (
           <ProductModal
