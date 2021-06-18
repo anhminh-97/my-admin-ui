@@ -46,6 +46,7 @@ const ProductAdmin = () => {
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [filters, setFilters] = useState({});
+
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
     setFilters((prev) => ({ ...prev, ...params }));
@@ -56,26 +57,11 @@ const ProductAdmin = () => {
     };
   }, [location.search]);
 
-  // const parsed = queryString.parse(location.search);
-  const stringified = queryString.stringify(filters);
-  // console.log(`location`, location, parsed);
-  // filter
-  // useEffect(() => {
-  //   console.log("!isEmty===>", parsed);
-  //   if (!isEmpty(parsed)) {
-  //     dispatch(getAllProducts(filter));
-  //   } else {
-  //     console.log("ELSE");
-  //     const params = { ...filter, ...parsed };
-  //     setFilter(params);
-  //     dispatch(getAllProducts(params));
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
   useEffect(() => {
     dispatch(getAllProducts(queryParams));
   }, [queryParams, dispatch]);
-
+  
+  const stringified = queryString.stringify(filters);
   useGetCategory();
 
   // Function

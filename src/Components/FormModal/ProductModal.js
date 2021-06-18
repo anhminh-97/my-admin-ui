@@ -9,25 +9,27 @@ const { Option } = Select;
 const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
   const allCategories = useSelector((state) => state.category.allCategories);
-  console.log(`allCategories`, allCategories)
 
   const [category, setCategory] = useState({});
 
-  const handleSelect = (values) => {
-    setCategory(values);
+  const handleSelect = (values, item) => {
+    console.log("item", item.attr);
+    setCategory(item.attr);
   };
   useEffect(() => {
     if (isEmpty(category)) {
       setCategory(
         !isEmpty(data)
-          ? allCategories
-              .filter((item) => item.id === data.categoryId)
-              .map((item) => {
-                return { ...category, name: item.name, id: item.id };
-              })
+          ? {
+              ...allCategories
+                .filter((item) => item.id === data.categoryId)
+                .map((item) => {
+                  console.log("item", item);
+                  return { ...category, name: item.name, id: item.id };
+                })[0],
+            }
           : category
       );
-      console.log("datas", category, data);
     }
   }, [allCategories, data.categoryId, data.id, data, category]);
 
@@ -42,7 +44,8 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         form
           .validateFields()
           .then((values) => {
-            const value = { ...values, categoryId: category[0]?.id };
+            const value = { ...values, categoryId: category.id };
+            console.log("ssss", value);
             form.resetFields();
             onCreate(value);
           })
@@ -100,13 +103,13 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
               {allCategories && (
                 <Select
                   placeholder="Select a category"
-                  value={category[0]?.name}
+                  value={category.name}
                   style={{ width: 120 }}
                   onChange={handleSelect}
                 >
-                  {allCategories.map((item, key) => {
+                  {allCategories.map((item) => {
                     return (
-                      <Option value={item.name} key={key.toString()}>
+                      <Option value={item.name} key={item.id} attr={item}>
                         {item.name}
                       </Option>
                     );
