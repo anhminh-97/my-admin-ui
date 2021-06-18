@@ -27,7 +27,6 @@ import {
   updateProduct,
 } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
-// import isEmpty from "lodash";
 import moment from "moment";
 import queryString from "query-string";
 import React, { useEffect, useMemo, useState } from "react";
@@ -46,7 +45,6 @@ const ProductAdmin = () => {
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
   const total = useSelector((state) => state.product.total);
-  const status = useSelector((state) => state.product.status);
   const allCategories = useSelector((state) => state.category.allCategories);
 
   // useState
@@ -54,7 +52,7 @@ const ProductAdmin = () => {
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [filters, setFilters] = useState({});
-  const [isActive, setisActive] = useState(status);
+  const [status, setStatus] = useState(true);
 
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
@@ -127,7 +125,7 @@ const ProductAdmin = () => {
 
   // Change status
   const handleStatus = (record, event) => {
-    setisActive(event);
+    setStatus(event);
     // const updatedValue = {
     //   ...record,
     //   status: event,
@@ -142,7 +140,7 @@ const ProductAdmin = () => {
     //   message.success("Update Successfully");
     //   dispatch(getAllProducts(queryParams));
     // }
-    console.log("status :>> ", event, isActive);
+    console.log("status :>> ", event, status);
   };
 
   // Filters
@@ -221,11 +219,11 @@ const ProductAdmin = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status, record) => (
+      render: (active, record) => (
         <Switch
           checkedChildren={<CheckOutlined />}
           unCheckedChildren={<CloseOutlined />}
-          checked={isActive}
+          checked={status}
           onChange={() => handleStatus(record)}
         />
       ),
