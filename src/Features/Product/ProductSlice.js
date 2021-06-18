@@ -30,8 +30,10 @@ const ProductSlice = createSlice({
       state.loading = true;
     },
     [getAllProducts.fulfilled]: (state, action) => {
-      state.allProducts = action.payload.data;
-      state.total = action.payload.pagination._totalRows;
+      const result = action.payload;
+
+      state.allProducts = result.data;
+      state.total = result.pagination._totalRows;
       state.loading = false;
     },
     [getAllProducts.rejected]: (state) => {

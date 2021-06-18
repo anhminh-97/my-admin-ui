@@ -13,7 +13,6 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [category, setCategory] = useState({});
 
   const handleSelect = (values, item) => {
-    console.log("item", item.attr);
     setCategory(item.attr);
   };
   useEffect(() => {
@@ -24,7 +23,6 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
               ...allCategories
                 .filter((item) => item.id === data.categoryId)
                 .map((item) => {
-                  console.log("item", item);
                   return { ...category, name: item.name, id: item.id };
                 })[0],
             }
@@ -45,7 +43,6 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           .validateFields()
           .then((values) => {
             const value = { ...values, categoryId: category.id };
-            console.log("ssss", value);
             form.resetFields();
             onCreate(value);
           })
@@ -54,7 +51,6 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           });
       }}
     >
-      {console.log("===>", category)}
       <Form
         form={form}
         layout="vertical"

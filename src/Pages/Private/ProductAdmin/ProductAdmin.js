@@ -1,4 +1,10 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -10,6 +16,7 @@ import {
   Slider,
   Space,
   Spin,
+  Switch,
   Table,
 } from "antd";
 import { ProductModal } from "Components/FormModal";
@@ -39,6 +46,7 @@ const ProductAdmin = () => {
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
   const total = useSelector((state) => state.product.total);
+  const status = useSelector((state) => state.product.status);
   const allCategories = useSelector((state) => state.category.allCategories);
 
   // useState
@@ -46,30 +54,32 @@ const ProductAdmin = () => {
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [filters, setFilters] = useState({});
+  const [isActive, setisActive] = useState(status);
 
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
     setFilters((prev) => ({ ...prev, ...params }));
     return {
       ...params,
-      _page: 1,
-      _limit: 10,
+      _page: Number.parseInt(params._page) || 1,
+      _limit: Number.parseInt(params._limit) || 10,
     };
   }, [location.search]);
 
   useEffect(() => {
     dispatch(getAllProducts(queryParams));
   }, [queryParams, dispatch]);
-  
-  const stringified = queryString.stringify(filters);
-  useGetCategory();
 
-  // Function
+  useGetCategory();
+  const stringified = queryString.stringify(filters);
+
   const showModal = (value) => {
     setData(value);
     setEditMode(true);
     setVisible(true);
   };
+
+  // Delete
   const onConfirm = async (id) => {
     const resultAction = await dispatch(deleteProduct(id));
     if (resultAction.error) {
@@ -83,14 +93,8 @@ const ProductAdmin = () => {
     setEditMode(false);
     setData({});
   };
-  const handleClear = () => {
-    setFilters({ _page: 1, _limit: 10 });
-    history.push({
-      pathname: history.location.pathname,
-      search: queryString.stringify({ _page: 1, _limit: 10 }),
-    });
-  };
 
+  // Create
   const onHandleCreate = async (value) => {
     setVisible(false);
     setData({});
@@ -103,6 +107,7 @@ const ProductAdmin = () => {
     }
   };
 
+  // Update
   const onHandleUpdate = async (value) => {
     const updatedValue = {
       ...data,
@@ -119,6 +124,28 @@ const ProductAdmin = () => {
       dispatch(getAllProducts(queryParams));
     }
   };
+
+  // Change status
+  const handleStatus = (record, event) => {
+    setisActive(event);
+    // const updatedValue = {
+    //   ...record,
+    //   status: event,
+    // };
+    // setVisible(false);
+    // setData({});
+    // setEditMode(false);
+    // const resultAction = await dispatch(updateProduct(updatedValue));
+    // if (resultAction.error) {
+    //   message.error("Update Failed");
+    // } else {
+    //   message.success("Update Successfully");
+    //   dispatch(getAllProducts(queryParams));
+    // }
+    console.log("status :>> ", event, isActive);
+  };
+
+  // Filters
   const handleSelect = (value) => {
     setFilters((prev) => ({ ...prev, _sort: "price", _order: value }));
   };
@@ -137,6 +164,13 @@ const ProductAdmin = () => {
   const handleFilter = () => {
     history.push({ pathname: history.location.pathname, search: stringified });
     dispatch(getAllProducts(queryParams));
+  };
+  const handleClear = () => {
+    setFilters({ _page: 1, _limit: 10 });
+    history.push({
+      pathname: history.location.pathname,
+      search: queryString.stringify({ _page: 1, _limit: 10 }),
+    });
   };
 
   const columns = [
@@ -182,6 +216,19 @@ const ProductAdmin = () => {
       dataIndex: "updateAt",
       key: "updateAt",
       render: (updateAt) => moment(updateAt).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) => (
+        <Switch
+          checkedChildren={<CheckOutlined />}
+          unCheckedChildren={<CloseOutlined />}
+          checked={isActive}
+          onChange={() => handleStatus(record)}
+        />
+      ),
     },
     {
       title: "Action",
@@ -233,12 +280,7 @@ const ProductAdmin = () => {
                 <Option value="asc">ASC</Option>
                 <Option value="desc">DESC</Option>
               </Select>
-              <Input
-                value={filters.name_like}
-                onChange={handleSearch}
-                placeholder="Search..."
-                // onSearch={onHandleSearch}
-              />
+              <Input value={filters.name_like} onChange={handleSearch} placeholder="Search..." />
               <Button onClick={handleClear}>Clear</Button>
               <Button type="primary" onClick={handleFilter}>
                 Filter
