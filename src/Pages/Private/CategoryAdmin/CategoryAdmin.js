@@ -1,6 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Input, message, Popconfirm, Row, Space, Spin, Table, Form } from "antd";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Input,
+  message,
+  Popconfirm,
+  Row,
+  Space,
+  Spin,
+  Table,
+  Form,
+  Select,
+  Switch,
+} from "antd";
 import moment from "moment";
 import queryString from "query-string";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +33,8 @@ import {
 } from "Features/Category/CategorySlice";
 import { CategoryModal } from "Components/FormModal";
 import "./CategoryAdmin.Style.less";
+
+const { Option } = Select;
 
 const CategoryAdmin = () => {
   const dispatch = useDispatch();
@@ -117,6 +138,9 @@ const CategoryAdmin = () => {
     dispatch(getCategoriesFilter(params));
     history.push({ pathname: history.location.pathname, search: queryString.stringify(params) });
   };
+  const handleFilterStatus = (value) => {
+    setFilter((prev) => ({ ...prev, status: value }));
+  };
 
   // Clear all filters
   const handleClear = () => {
@@ -125,6 +149,24 @@ const CategoryAdmin = () => {
       pathname: history.location.pathname,
       search: queryString.stringify({ _page: 1, _limit: 10 }),
     });
+  };
+
+  // Change status
+  const handleStatus = async (record) => {
+    const updatedValue = {
+      ...record,
+      status: !record.status,
+    };
+    setVisible(false);
+    setData({});
+    setEditMode(false);
+    const resultAction = await dispatch(updateCategory(updatedValue));
+    if (resultAction.error) {
+      message.error("Update Failed");
+    } else {
+      message.success("Update Successfully");
+      dispatch(getCategoriesFilter(queryParams));
+    }
   };
 
   const columns = [
@@ -144,6 +186,21 @@ const CategoryAdmin = () => {
       dataIndex: "updateAt",
       key: "updateAt",
       render: (updateAt) => moment(updateAt).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) => {
+        return (
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={status}
+            onChange={() => handleStatus(record)}
+          />
+        );
+      },
     },
     {
       title: "Action",
@@ -176,8 +233,17 @@ const CategoryAdmin = () => {
           <Col>
             <Form>
               <Space style={{ marginBottom: 16 }}>
+                <Select
+                  value={filter.status}
+                  placeholder="Status"
+                  style={{ width: 120 }}
+                  onChange={handleFilterStatus}
+                >
+                  <Option value="true">Visible</Option>
+                  <Option value="false">Hidden</Option>
+                </Select>
                 <Input
-                  value={filter.name_like || ""}
+                  value={filter.name_like}
                   onChange={handleSearch}
                   placeholder="Search..."
                 />
@@ -194,6 +260,7 @@ const CategoryAdmin = () => {
           columns={columns}
           onChange={handlePagination}
           pagination={{
+            position: ["topRight", "bottomRight"],
             total: `${total}`,
             current: `${filter._page}`,
             showSizeChanger: true,

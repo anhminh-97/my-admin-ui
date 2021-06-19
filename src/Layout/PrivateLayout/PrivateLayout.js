@@ -16,7 +16,7 @@ import { logout } from "Features/Auth/UserSlice";
 import isEmpty from "lodash/isEmpty";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import "./PrivateLayout.Style.less";
 
 const { SubMenu } = Menu;
@@ -25,6 +25,9 @@ const { Header, Sider, Content } = Layout;
 const PrivateLayout = ({ children, icon, label }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const location = useLocation();
+  const { pathname } = location;
+  const pathnames = pathname.split("/").filter((item) => item);
   // Redux
   const user = useSelector((state) => state.user.current);
   // const isLoggedIn = !!user.id
@@ -111,18 +114,30 @@ const PrivateLayout = ({ children, icon, label }) => {
         <Row className="breadcrumb">
           <Col>
             <Breadcrumb>
-              <Breadcrumb.Item onClick={() => history.push(ROUTER.Dashboard)}>
-                <DashboardOutlined /> <span>Dashboard</span>
-              </Breadcrumb.Item>
-              {icon && label ? (
+              {pathnames.length ? (
                 <Breadcrumb.Item>
-                  <Link to="">
-                    {icon} <span>{label}</span>
+                  <Link to={ROUTER.Dashboard}>
+                    <DashboardOutlined />
+                    &ensp;Dashboard
                   </Link>
                 </Breadcrumb.Item>
               ) : (
-                ""
+                <Breadcrumb.Item>
+                  <DashboardOutlined />
+                  &ensp;Dashboard
+                </Breadcrumb.Item>
               )}
+              {pathnames.map((name, index) => {
+                const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
+                const isLast = index === pathnames.length - 1;
+                return isLast ? (
+                  <Breadcrumb.Item>{name}</Breadcrumb.Item>
+                ) : (
+                  <Breadcrumb.Item>
+                    <Link to={`${routeTo}`}>{name}</Link>
+                  </Breadcrumb.Item>
+                );
+              })}
             </Breadcrumb>
           </Col>
         </Row>

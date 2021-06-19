@@ -56,7 +56,6 @@ const ProductAdmin = () => {
     _page: 1,
     _limit: 10,
   });
-  const [status, setStatus] = useState(true);
 
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
@@ -128,27 +127,25 @@ const ProductAdmin = () => {
   };
 
   // Change status
-  const handleStatus = (record, event) => {
-    setStatus(event);
-    // const updatedValue = {
-    //   ...record,
-    //   status: event,
-    // };
-    // setVisible(false);
-    // setData({});
-    // setEditMode(false);
-    // const resultAction = await dispatch(updateProduct(updatedValue));
-    // if (resultAction.error) {
-    //   message.error("Update Failed");
-    // } else {
-    //   message.success("Update Successfully");
-    //   dispatch(getAllProducts(queryParams));
-    // }
-    console.log("status :>> ", event, status);
+  const handleStatus = async (record) => {
+    const updatedValue = {
+      ...record,
+      status: !record.status,
+    };
+    setVisible(false);
+    setData({});
+    setEditMode(false);
+    const resultAction = await dispatch(updateProduct(updatedValue));
+    if (resultAction.error) {
+      message.error("Update Failed");
+    } else {
+      message.success("Update Successfully");
+      dispatch(getAllProducts(queryParams));
+    }
   };
 
   // Filters
-  const handleSelect = (value) => {
+  const handleSortBy = (value) => {
     setFilters((prev) => ({ ...prev, _sort: "price", _order: value }));
   };
   const handleSearch = (e) => {
@@ -162,6 +159,9 @@ const ProductAdmin = () => {
   };
   const handleSortPrice = (value) => {
     setFilters((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
+  };
+  const handleFilterStatus = (value) => {
+    setFilters((prev) => ({ ...prev, status: value }));
   };
   const handleFilter = () => {
     history.push({ pathname: history.location.pathname, search: stringified });
@@ -225,14 +225,16 @@ const ProductAdmin = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (active, record) => (
-        <Switch
-          checkedChildren={<CheckOutlined />}
-          unCheckedChildren={<CloseOutlined />}
-          checked={status}
-          onChange={() => handleStatus(record)}
-        />
-      ),
+      render: (status, record) => {
+        return (
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={status}
+            onChange={() => handleStatus(record)}
+          />
+        );
+      },
     },
     {
       title: "Action",
@@ -258,13 +260,16 @@ const ProductAdmin = () => {
   return (
     <div className="product-admin-wrapper">
       <Spin spinning={loading} tip="Loading..." className="spin-loading">
-        <Row justify="space-between">
+        <Row justify="end">
           <Col>
             <Button onClick={() => setVisible(true)} type="primary">
               <PlusOutlined /> Add new
             </Button>
           </Col>
-          <Col span={6}>
+        </Row>
+        <br/>
+        <Row justify="space-between">
+          <Col span={8}>
             <Slider
               value={[filters.price_gte, filters.price_lte]}
               marks={{ 0: "0", 1000: "1000" }}
@@ -280,10 +285,19 @@ const ProductAdmin = () => {
                   value={filters._order}
                   placeholder="Sort By"
                   style={{ width: 120 }}
-                  onChange={handleSelect}
+                  onChange={handleSortBy}
                 >
                   <Option value="asc">ASC</Option>
                   <Option value="desc">DESC</Option>
+                </Select>
+                <Select
+                  value={filters.status}
+                  placeholder="Status"
+                  style={{ width: 120 }}
+                  onChange={handleFilterStatus}
+                >
+                  <Option value="true">Visible</Option>
+                  <Option value="false">Hidden</Option>
                 </Select>
                 <Input value={filters.name_like} onChange={handleSearch} placeholder="Search..." />
                 <Button onClick={handleClear}>Clear</Button>
@@ -299,6 +313,7 @@ const ProductAdmin = () => {
           columns={columns}
           onChange={handlePagination}
           pagination={{
+            position: ["topRight", "bottomRight"],
             total: `${total}`,
             current: `${filters._page}`,
             showSizeChanger: true,

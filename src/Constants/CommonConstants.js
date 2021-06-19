@@ -7,8 +7,8 @@ export const COLORS = {
 export const ROUTER = {
   Home: "/",
   Dashboard: "/dashboard",
-  ProductAdmin: "/product-admin",
-  CategoryAdmin: "/category-admin",
+  ProductAdmin: "/product",
+  CategoryAdmin: "/category",
   AddProduct: "/add-product",
   Login: "/login",
 };
