@@ -1,31 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, message, Popconfirm, Row, Space, Spin, Table } from "antd";
+import { Button, Col, Input, message, Popconfirm, Row, Space, Spin, Table, Form } from "antd";
 import moment from "moment";
+import queryString from "query-string";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useLocation } from "react-router-dom";
 
-import useGetCategory from "Hooks/CategoryHook";
-import { addCategory, deleteCategory, updateCategory } from "Features/Category/CategorySlice";
-import "./CategoryAdmin.Style.less";
+import {
+  addCategory,
+  deleteCategory,
+  getCategoriesFilter,
+  updateCategory,
+} from "Features/Category/CategorySlice";
 import { CategoryModal } from "Components/FormModal";
-import { getAllProducts } from "Features/Product/ProductSlice";
-
-// const { Option } = Select;
+import "./CategoryAdmin.Style.less";
 
 const CategoryAdmin = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
+  const location = useLocation();
 
   // Redux
   const allCategories = useSelector((state) => state.category.allCategories);
   const loading = useSelector((state) => state.category.loading);
+  const total = useSelector((state) => state.category.total);
 
   // State
   const [data, setData] = useState({});
   const [visible, setVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [filter, setFilter] = useState({
+    _page: 1,
+    _limit: 10,
+  });
+
+  const queryParams = useMemo(() => {
+    const params = queryString.parse(location.search);
+    setFilter((prev) => ({ ...prev, ...params }));
+    return {
+      ...params,
+      _page: Number.parseInt(params._page) || 1,
+      _limit: Number.parseInt(params._limit) || 10,
+    };
+  }, [location.search]);
 
   // useEffect
-  useGetCategory();
+  useEffect(() => {
+    dispatch(getCategoriesFilter(queryParams));
+  }, [queryParams, dispatch]);
 
   // Function
   const showModal = (value) => {
@@ -33,8 +55,15 @@ const CategoryAdmin = () => {
     setVisible(true);
     setEditMode(true);
   };
-  const onConfirm = (id) => {
-    dispatch(deleteCategory({ id, mesResult }));
+
+  // Delete
+  const onConfirm = async (id) => {
+    const resultAction = await dispatch(deleteCategory(id));
+    if (resultAction.error) {
+      message.error("Delete Failed");
+    } else {
+      message.success("Delete Successfully");
+    }
   };
   const onCancel = () => {
     setVisible(false);
@@ -42,33 +71,60 @@ const CategoryAdmin = () => {
     setData({});
   };
 
-  const mesResult = (success) => {
-    if (success) {
-      message.success("Successfully");
-    } else {
-      message.error("Failed");
-    }
-  };
-
+  // Create
   const onHandleCreate = async (value) => {
     setVisible(false);
     setData({});
-    await dispatch(addCategory({ value, mesResult }));
-    dispatch(getAllProducts());
+    const resultAction = await dispatch(addCategory(value));
+    if (resultAction.error) {
+      message.error("Create Failed");
+    } else {
+      message.success("Create Successfully");
+      dispatch(getCategoriesFilter(queryParams));
+    }
   };
 
+  // Update
   const onHandleUpdate = async (value) => {
     const updatedValue = {
       ...data,
-      name: value.name,
-      description: value.description,
-      color: value.color,
-      price: value.price,
+      ...value,
     };
     setVisible(false);
     setData({});
-    await dispatch(updateCategory({ updatedValue, mesResult }));
-    dispatch(getAllProducts());
+    const resultAction = await dispatch(updateCategory(updatedValue));
+    if (resultAction.error) {
+      message.error("Update Failed");
+    } else {
+      message.success("Update Successfully");
+      dispatch(getCategoriesFilter(queryParams));
+    }
+  };
+
+  // Search
+  const handleSearch = (e) => {
+    setFilter((prev) => ({ ...prev, name_like: e.target.value }));
+  };
+
+  // Filter
+  const handleFilter = () => {
+    history.push({ pathname: history.location.pathname, search: queryString.stringify(filter) });
+    dispatch(getCategoriesFilter(queryParams));
+  };
+
+  const handlePagination = (pagination) => {
+    const params = { ...queryParams, _page: pagination.current, _limit: pagination.pageSize };
+    dispatch(getCategoriesFilter(params));
+    history.push({ pathname: history.location.pathname, search: queryString.stringify(params) });
+  };
+
+  // Clear all filters
+  const handleClear = () => {
+    setFilter({ _page: 1, _limit: 10 });
+    history.push({
+      pathname: history.location.pathname,
+      search: queryString.stringify({ _page: 1, _limit: 10 }),
+    });
   };
 
   const columns = [
@@ -118,14 +174,32 @@ const CategoryAdmin = () => {
             </Button>
           </Col>
           <Col>
-            <Space style={{ marginBottom: 16 }}>
-              <Button>Sort age</Button>
-              <Button>Clear</Button>
-              <Button type="primary">Filter</Button>
-            </Space>
+            <Form>
+              <Space style={{ marginBottom: 16 }}>
+                <Input
+                  value={filter.name_like || ""}
+                  onChange={handleSearch}
+                  placeholder="Search..."
+                />
+                <Button onClick={handleClear}>Clear</Button>
+                <Button htmlType="submit" type="primary" onClick={handleFilter}>
+                  Filter
+                </Button>
+              </Space>
+            </Form>
           </Col>
         </Row>
-        <Table dataSource={allCategories} columns={columns} />
+        <Table
+          dataSource={allCategories}
+          columns={columns}
+          onChange={handlePagination}
+          pagination={{
+            total: `${total}`,
+            current: `${filter._page}`,
+            showSizeChanger: true,
+            showTotal: (total) => `Total: ${total}`,
+          }}
+        />
         {visible && (
           <CategoryModal
             editMode={editMode}

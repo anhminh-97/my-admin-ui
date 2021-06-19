@@ -1,7 +1,7 @@
 import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select } from "antd";
 import moment from "moment";
 import isEmpty from "lodash/isEmpty";
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 
 const { Option } = Select;
@@ -12,10 +12,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
 
   const [category, setCategory] = useState({});
 
-  const handleSelect = (values, item) => {
-    setCategory(item.attr);
-  };
-  useEffect(() => {
+  useMemo(() => {
     if (isEmpty(category)) {
       setCategory(
         !isEmpty(data)
@@ -29,7 +26,12 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           : category
       );
     }
-  }, [allCategories, data.categoryId, data.id, data, category]);
+  }, [allCategories, data, category]);
+
+  // Select
+  const handleSelect = (values, item) => {
+    setCategory(item.attr);
+  };
 
   return (
     <Modal

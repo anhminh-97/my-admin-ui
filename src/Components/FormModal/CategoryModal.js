@@ -50,12 +50,12 @@ const CategoryModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           <Row gutter={24}>
             <Col>
               <Form.Item label="Created At:">
-                <DatePicker defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
+                <DatePicker disabled defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
             <Col>
               <Form.Item label="Updated At:">
-                <DatePicker defaultValue={moment(data.updateAt)} format="DD/MM/YYYY" />
+                <DatePicker disabled defaultValue={moment(data.updatedAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
           </Row>

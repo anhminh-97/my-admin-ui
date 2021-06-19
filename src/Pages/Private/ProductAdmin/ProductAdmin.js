@@ -8,6 +8,7 @@ import {
 import {
   Button,
   Col,
+  Form,
   Input,
   message,
   Popconfirm,
@@ -39,7 +40,7 @@ const { Option } = Select;
 const ProductAdmin = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  let location = useLocation();
+  const location = useLocation();
 
   // Redux
   const allProducts = useSelector((state) => state.product.allProducts);
@@ -51,7 +52,10 @@ const ProductAdmin = () => {
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState({});
   const [editMode, setEditMode] = useState(false);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({
+    _page: 1,
+    _limit: 10,
+  });
   const [status, setStatus] = useState(true);
 
   const queryParams = useMemo(() => {
@@ -100,7 +104,7 @@ const ProductAdmin = () => {
     if (resultAction.error) {
       message.error("Create Failed");
     } else {
-      message.success("create Successfully");
+      message.success("Create Successfully");
       dispatch(getAllProducts(queryParams));
     }
   };
@@ -163,6 +167,8 @@ const ProductAdmin = () => {
     history.push({ pathname: history.location.pathname, search: stringified });
     dispatch(getAllProducts(queryParams));
   };
+
+  // Clear all filters
   const handleClear = () => {
     setFilters({ _page: 1, _limit: 10 });
     history.push({
@@ -268,22 +274,24 @@ const ProductAdmin = () => {
             />
           </Col>
           <Col>
-            <Space style={{ marginBottom: 16 }}>
-              <Select
-                value={filters._order}
-                placeholder="Sort"
-                style={{ width: 120 }}
-                onChange={handleSelect}
-              >
-                <Option value="asc">ASC</Option>
-                <Option value="desc">DESC</Option>
-              </Select>
-              <Input value={filters.name_like} onChange={handleSearch} placeholder="Search..." />
-              <Button onClick={handleClear}>Clear</Button>
-              <Button type="primary" onClick={handleFilter}>
-                Filter
-              </Button>
-            </Space>
+            <Form>
+              <Space style={{ marginBottom: 16 }}>
+                <Select
+                  value={filters._order}
+                  placeholder="Sort By"
+                  style={{ width: 120 }}
+                  onChange={handleSelect}
+                >
+                  <Option value="asc">ASC</Option>
+                  <Option value="desc">DESC</Option>
+                </Select>
+                <Input value={filters.name_like} onChange={handleSearch} placeholder="Search..." />
+                <Button onClick={handleClear}>Clear</Button>
+                <Button htmlType="submit" type="primary" onClick={handleFilter}>
+                  Filter
+                </Button>
+              </Space>
+            </Form>
           </Col>
         </Row>
         <Table

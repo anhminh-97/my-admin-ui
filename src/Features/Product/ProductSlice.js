@@ -26,6 +26,7 @@ const ProductSlice = createSlice({
   initialState: { allProducts: [], loading: false, total: 0 },
   reducers: {},
   extraReducers: {
+    // Get all products
     [getAllProducts.pending]: (state) => {
       state.loading = true;
     },
@@ -39,18 +40,20 @@ const ProductSlice = createSlice({
     [getAllProducts.rejected]: (state) => {
       state.loading = false;
     },
+
+    // Create a product
     [addProduct.pending]: (state) => {
       state.loading = true;
     },
     [addProduct.fulfilled]: (state, action) => {
       state.allProducts = [action.payload, ...state.allProducts];
-      // action.payload.mesResult(true);
       state.loading = false;
     },
     [addProduct.rejected]: (state) => {
-      // action.payload.mesResult(false);
       state.loading = false;
     },
+
+    // Update a product
     [updateProduct.pending]: (state) => {
       state.loading = true;
     },
@@ -62,24 +65,22 @@ const ProductSlice = createSlice({
       //     return UpdatedData;
       //   } else return item;
       // });
-      // action.payload.mesResult(true);
       state.loading = false;
     },
     [updateProduct.rejected]: (state) => {
       state.loading = false;
-      // action.payload.mesResult(false);
     },
+
+    // Delete a product
     [deleteProduct.pending]: (state) => {
       state.loading = true;
     },
     [deleteProduct.fulfilled]: (state, action) => {
       state.loading = false;
       state.allProducts = state.allProducts.filter((item) => item.id !== action.payload);
-      // action.payload.mesResult(true);
     },
     [deleteProduct.rejected]: (state) => {
       state.loading = false;
-      // action.payload.mesResult(false);
     },
   },
 });
