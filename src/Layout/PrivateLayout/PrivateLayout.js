@@ -22,12 +22,13 @@ import "./PrivateLayout.Style.less";
 const { SubMenu } = Menu;
 const { Header, Sider, Content } = Layout;
 
-const PrivateLayout = ({ children, icon, label }) => {
+const PrivateLayout = ({ children }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const location = useLocation();
   const { pathname } = location;
   const pathnames = pathname.split("/").filter((item) => item);
+  const capatilize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   // Redux
   const user = useSelector((state) => state.user.current);
   // const isLoggedIn = !!user.id
@@ -131,10 +132,10 @@ const PrivateLayout = ({ children, icon, label }) => {
                 const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
                 const isLast = index === pathnames.length - 1;
                 return isLast ? (
-                  <Breadcrumb.Item>{name}</Breadcrumb.Item>
+                  <Breadcrumb.Item key={index.toString()}>{capatilize(name)}</Breadcrumb.Item>
                 ) : (
-                  <Breadcrumb.Item>
-                    <Link to={`${routeTo}`}>{name}</Link>
+                  <Breadcrumb.Item key={index.toString()}>
+                    <Link to={`${routeTo}`}>{capatilize(name)}</Link>
                   </Breadcrumb.Item>
                 );
               })}

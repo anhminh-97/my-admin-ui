@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Switch } from "react-router-dom";
 import { ROUTER } from "../Constants/CommonConstants";
 import PrivateRoute from "./Private.Route";
 import PublicRoute from "./Public.Route";
-import { CategoryAdmin, Dashboard, Home, ProductAdmin, Login } from "Pages";
+import { CategoryAdmin, Dashboard, Home, ProductAdmin, Login, ProductDetail } from "Pages";
+// import UserAdmin from "Pages/Private/UserAdmin";
 
 const Routes = () => {
   return (
@@ -15,6 +16,8 @@ const Routes = () => {
         <PrivateRoute path={ROUTER.Dashboard} exact component={Dashboard} />
         <PrivateRoute path={ROUTER.ProductAdmin} exact component={ProductAdmin} />
         <PrivateRoute path={ROUTER.CategoryAdmin} exact component={CategoryAdmin} />
+        {/* <PrivateRoute path={ROUTER.User} exact component={UserAdmin} /> */}
+        <PrivateRoute path={`${ROUTER.ProductDetail}/:id`} component={ProductDetail} />
       </Switch>
     </Router>
   );

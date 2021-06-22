@@ -1,9 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ProductApi from "Api/ProductApi";
 
-export const getAllProducts = createAsyncThunk("product/getAllProducts", async (params) => {
-  const { data, pagination } = await ProductApi.getAll(params);
+export const getAllProducts = createAsyncThunk("product/getAllProducts", async (payload) => {
+  const { data, pagination } = await ProductApi.getAll(payload);
   return { data, pagination };
+});
+
+export const getProduct = createAsyncThunk("product/getProduct", async (id) => {
+  const response = await ProductApi.get(id);
+  return response;
 });
 
 export const addProduct = createAsyncThunk("product/addProduct", async (data) => {
@@ -23,7 +28,7 @@ export const deleteProduct = createAsyncThunk("product/deleteProduct", async (id
 
 const ProductSlice = createSlice({
   name: "product",
-  initialState: { allProducts: [], loading: false, total: 0 },
+  initialState: { allProducts: [], loading: false, total: 0, productDetail: {} },
   reducers: {},
   extraReducers: {
     // Get all products
@@ -38,6 +43,18 @@ const ProductSlice = createSlice({
       state.loading = false;
     },
     [getAllProducts.rejected]: (state) => {
+      state.loading = false;
+    },
+
+    // Get a product
+    [getProduct.pending]: (state) => {
+      state.loading = true;
+    },
+    [getProduct.fulfilled]: (state, action) => {
+      state.productDetail = action.payload;
+      state.loading = false;
+    },
+    [getProduct.rejected]: (state) => {
       state.loading = false;
     },
 

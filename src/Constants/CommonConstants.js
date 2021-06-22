@@ -11,6 +11,8 @@ export const ROUTER = {
   CategoryAdmin: "/category",
   AddProduct: "/add-product",
   Login: "/login",
+  user: "/user",
+  ProductDetail: "/product-detail",
 };
 export const storageKeys = {
   TOKEN: "access_token",

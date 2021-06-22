@@ -63,7 +63,7 @@ const Dashboard = () => {
               color = "volcano";
             }
             return (
-              <Tag color={color} key={index}>
+              <Tag color={color} key={index.toString()}>
                 {tag.toUpperCase()}
               </Tag>
             );

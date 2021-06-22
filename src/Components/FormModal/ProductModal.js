@@ -1,7 +1,7 @@
 import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select } from "antd";
 import moment from "moment";
 import isEmpty from "lodash/isEmpty";
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const { Option } = Select;
@@ -12,14 +12,15 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
 
   const [category, setCategory] = useState({});
 
-  useMemo(() => {
+  useEffect(() => {
     if (isEmpty(category)) {
       setCategory(
         !isEmpty(data)
           ? {
               ...allCategories
                 .filter((item) => item.id === data.categoryId)
-                .map((item) => {
+                .map((item, index) => {
+                  <span key={index.toString()} />;
                   return { ...category, name: item.name, id: item.id };
                 })[0],
             }
@@ -58,10 +59,10 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         layout="vertical"
         name="form_in_modal"
         initialValues={{
-          name: data ? data.name : "",
-          color: data ? data.color : "",
-          price: data ? data.price : "",
-          description: data ? data.description : "",
+          name: data.name ? data.name : "",
+          color: data.color ? data.color : "",
+          price: data.price ? data.price : "",
+          description: data.description ? data.description : "",
         }}
       >
         <Form.Item
@@ -105,9 +106,9 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
                   style={{ width: 120 }}
                   onChange={handleSelect}
                 >
-                  {allCategories.map((item) => {
+                  {allCategories.map((item, index) => {
                     return (
-                      <Option value={item.name} key={item.id} attr={item}>
+                      <Option value={item.name} key={index.toString()} attr={item}>
                         {item.name}
                       </Option>
                     );

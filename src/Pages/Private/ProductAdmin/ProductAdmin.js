@@ -3,6 +3,7 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  EyeOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import {
@@ -21,6 +22,7 @@ import {
   Table,
 } from "antd";
 import { ProductModal } from "Components/FormModal";
+import { ROUTER } from "Constants/CommonConstants";
 import {
   addProduct,
   deleteProduct,
@@ -67,6 +69,7 @@ const ProductAdmin = () => {
     };
   }, [location.search]);
 
+  // get products with query params
   useEffect(() => {
     dispatch(getAllProducts(queryParams));
   }, [queryParams, dispatch]);
@@ -177,6 +180,11 @@ const ProductAdmin = () => {
     });
   };
 
+  // Views details
+  const handleView = (id) => {
+    history.push(`${ROUTER.ProductDetail}/${id}`);
+  };
+
   const columns = [
     {
       title: "Name",
@@ -205,8 +213,8 @@ const ProductAdmin = () => {
       render: (id) =>
         allCategories
           .filter((item) => item.id === id)
-          .map((item, key) => {
-            return <span key={key.toString()}>{item.name}</span>;
+          .map((item, index) => {
+            return <span key={index.toString()}>{item.name}</span>;
           }),
     },
     {
@@ -239,7 +247,6 @@ const ProductAdmin = () => {
     {
       title: "Action",
       key: "action",
-      fixed: "right",
       render: (text, record) => (
         <Space size="middle">
           <EditOutlined onClick={() => showModal(record)} />
@@ -256,6 +263,18 @@ const ProductAdmin = () => {
         </Space>
       ),
     },
+    {
+      title: "View",
+      key: "view",
+      fixed: "right",
+      render: (text, record) => (
+        <Space size="middle">
+          <Button type="primary" onClick={() => handleView(record.id)}>
+            <EyeOutlined />
+          </Button>
+        </Space>
+      ),
+    },
   ];
   return (
     <div className="product-admin-wrapper">
@@ -267,7 +286,7 @@ const ProductAdmin = () => {
             </Button>
           </Col>
         </Row>
-        <br/>
+        <br />
         <Row justify="space-between">
           <Col span={8}>
             <Slider
