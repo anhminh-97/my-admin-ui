@@ -11,6 +11,7 @@ import {
   message,
   Form,
   Spin,
+  Switch,
 } from "antd";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,7 @@ import isEmpty from "lodash/isEmpty";
 
 import useGetCategory from "Hooks/CategoryHook";
 import { getProduct, updateProduct } from "Features/Product/ProductSlice";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -142,6 +144,7 @@ const ProductDetail = () => {
                   color: productDetail.color ? productDetail.color : "",
                   price: productDetail.price ? productDetail.price : "",
                   description: productDetail.description ? productDetail.description : "",
+                  status: productDetail?.status,
                 }}
               >
                 <Descriptions
@@ -191,6 +194,14 @@ const ProductDetail = () => {
                         })}
                       </Select>
                     )}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Status">
+                    <Form.Item name="status" valuePropName="checked" style={{ marginBottom: 0 }}>
+                      <Switch
+                        checkedChildren={<CheckOutlined />}
+                        unCheckedChildren={<CloseOutlined />}
+                      />
+                    </Form.Item>
                   </Descriptions.Item>
                   <Descriptions.Item label="Created at">
                     {moment(productDetail.createdAt).format("DD/MM/YYYY")}
