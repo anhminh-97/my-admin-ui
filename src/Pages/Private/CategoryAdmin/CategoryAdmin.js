@@ -57,7 +57,11 @@ const CategoryAdmin = () => {
 
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
-    setFilter((prev) => ({ ...prev, ...params }));
+    setFilter({
+      ...params,
+      _page: Number.parseInt(params._page) || 1,
+      _limit: Number.parseInt(params._limit) || 10,
+    });
     return {
       ...params,
       _page: Number.parseInt(params._page) || 1,
@@ -130,12 +134,10 @@ const CategoryAdmin = () => {
   // Filter
   const handleFilter = () => {
     history.push({ pathname: history.location.pathname, search: queryString.stringify(filter) });
-    dispatch(getCategoriesFilter(queryParams));
   };
 
   const handlePagination = (pagination) => {
     const params = { ...queryParams, _page: pagination.current, _limit: pagination.pageSize };
-    dispatch(getCategoriesFilter(params));
     history.push({ pathname: history.location.pathname, search: queryString.stringify(params) });
   };
   const handleFilterStatus = (value) => {
@@ -242,11 +244,7 @@ const CategoryAdmin = () => {
                   <Option value="true">Visible</Option>
                   <Option value="false">Hidden</Option>
                 </Select>
-                <Input
-                  value={filter.name_like}
-                  onChange={handleSearch}
-                  placeholder="Search..."
-                />
+                <Input value={filter.name_like} onChange={handleSearch} placeholder="Search..." />
                 <Button onClick={handleClear}>Clear</Button>
                 <Button htmlType="submit" type="primary" onClick={handleFilter}>
                   Filter
@@ -261,10 +259,10 @@ const CategoryAdmin = () => {
           onChange={handlePagination}
           pagination={{
             position: ["topRight", "bottomRight"],
-            total: `${total}`,
-            current: `${filter._page}`,
-            showSizeChanger: true,
-            showTotal: (total) => `Total: ${total}`,
+            total: total,
+            current: Number.parseInt(filter._page),
+            pageSize: Number.parseInt(filter._limit),
+            showTotal: (total) => <span>Total: {total}</span>,
           }}
         />
         {visible && (

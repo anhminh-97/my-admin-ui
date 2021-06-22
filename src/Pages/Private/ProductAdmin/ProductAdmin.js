@@ -20,7 +20,9 @@ import {
   Spin,
   Switch,
   Table,
+  Tag,
 } from "antd";
+import Paragraph from "antd/lib/typography/Paragraph";
 import { ProductModal } from "Components/FormModal";
 import { ROUTER } from "Constants/CommonConstants";
 import {
@@ -61,7 +63,11 @@ const ProductAdmin = () => {
 
   const queryParams = useMemo(() => {
     const params = queryString.parse(location.search);
-    setFilters((prev) => ({ ...prev, ...params }));
+    setFilters({
+      ...params,
+      _page: Number.parseInt(params._page) || 1,
+      _limit: Number.parseInt(params._limit) || 10,
+    });
     return {
       ...params,
       _page: Number.parseInt(params._page) || 1,
@@ -157,7 +163,8 @@ const ProductAdmin = () => {
   const handlePagination = (pagination) => {
     const params = { ...queryParams, _page: pagination.current, _limit: pagination.pageSize };
     const stringifiedParams = queryString.stringify(params);
-    dispatch(getAllProducts(params));
+    setFilters((prev) => ({ ...prev, _page: pagination.current, _limit: pagination.pageSize }));
+    // dispatch(getAllProducts(params));
     history.push({ pathname: history.location.pathname, search: stringifiedParams });
   };
   const handleSortPrice = (value) => {
@@ -168,7 +175,6 @@ const ProductAdmin = () => {
   };
   const handleFilter = () => {
     history.push({ pathname: history.location.pathname, search: stringified });
-    dispatch(getAllProducts(queryParams));
   };
 
   // Clear all filters
@@ -195,6 +201,7 @@ const ProductAdmin = () => {
       title: "Color",
       dataIndex: "color",
       key: "color",
+      render: (color) => <Tag key={color}>{color?.toUpperCase()}</Tag>,
     },
     {
       title: "Price",
@@ -205,6 +212,7 @@ const ProductAdmin = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      render: (description) => <Paragraph ellipsis={{ rows: 2 }}>{description}</Paragraph>,
     },
     {
       title: "Category",
@@ -334,8 +342,8 @@ const ProductAdmin = () => {
           pagination={{
             position: ["topRight", "bottomRight"],
             total: `${total}`,
-            current: `${filters._page}`,
-            showSizeChanger: true,
+            current: Number.parseInt(filters._page),
+            pageSize: Number.parseInt(filters._limit),
             showTotal: (total) => `Total: ${total}`,
           }}
         />

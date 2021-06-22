@@ -75,13 +75,13 @@ const ProductSlice = createSlice({
       state.loading = true;
     },
     [updateProduct.fulfilled]: (state, action) => {
-      // const data = action.payload.updatedValue;
-      // state.allProducts = state.allProducts.map((item) => {
-      //   if (item.id === data.id) {
+      // const data = action.payload;
+      // state.allProducts = state.allProducts
+      //   .filter((item) => item.id === data.id)
+      //   .map((item) => {
       //     const { UpdatedData } = { ...item, data };
       //     return UpdatedData;
-      //   } else return item;
-      // });
+      //   });
       state.loading = false;
     },
     [updateProduct.rejected]: (state) => {

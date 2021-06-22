@@ -3,6 +3,7 @@ import moment from "moment";
 import isEmpty from "lodash/isEmpty";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import InputColor from "Components/InputColor";
 
 const { Option } = Select;
 
@@ -77,12 +78,10 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         >
           <Input />
         </Form.Item>
+        <Form.Item name="color" label="Color:" valuePropName="color">
+          <InputColor />
+        </Form.Item>
         <Row gutter={24}>
-          <Col>
-            <Form.Item name="color" label="Color:">
-              <Input />
-            </Form.Item>
-          </Col>
           <Col>
             <Form.Item
               name="price"
@@ -119,7 +118,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
           </Col>
         </Row>
         <Form.Item name="description" label="Description:">
-          <Input.TextArea />
+          <Input.TextArea autoSize />
         </Form.Item>
         {editMode && (
           <Row gutter={24}>

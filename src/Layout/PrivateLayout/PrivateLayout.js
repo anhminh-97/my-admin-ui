@@ -14,7 +14,7 @@ import { Avatar, Breadcrumb, Col, Dropdown, Layout, Menu, Row } from "antd";
 import { ROUTER } from "Constants/CommonConstants";
 import { logout } from "Features/Auth/UserSlice";
 import isEmpty from "lodash/isEmpty";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import "./PrivateLayout.Style.less";
@@ -29,15 +29,10 @@ const PrivateLayout = ({ children }) => {
   const { pathname } = location;
   const pathnames = pathname.split("/").filter((item) => item);
   const capatilize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
   // Redux
   const user = useSelector((state) => state.user.current);
-  // const isLoggedIn = !!user.id
 
-  useEffect(() => {
-    if (isEmpty(user)) {
-      history.push(ROUTER.Login);
-    }
-  }, [history, user]);
   // State
   const [collapsed, setCollapsed] = useState(false);
 
@@ -73,8 +68,8 @@ const PrivateLayout = ({ children }) => {
             <Menu.Item key="10">Add new</Menu.Item>
             <Menu.Item key="11">Category</Menu.Item>
           </SubMenu>
-          <SubMenu key="products" icon={<ShoppingCartOutlined />} title="Products">
-            <Menu.Item key="allProducts">
+          <SubMenu key="production" icon={<ShoppingCartOutlined />} title="Products">
+            <Menu.Item key="products">
               <Link to={ROUTER.ProductAdmin}>All Products</Link>
             </Menu.Item>
             <Menu.Item key="category">

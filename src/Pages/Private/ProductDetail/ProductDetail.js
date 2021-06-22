@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Descriptions,
   Input,
@@ -21,6 +21,7 @@ import isEmpty from "lodash/isEmpty";
 import useGetCategory from "Hooks/CategoryHook";
 import { getProduct, updateProduct } from "Features/Product/ProductSlice";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import InputColor from "Components/InputColor";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -43,14 +44,13 @@ const ProductDetail = () => {
   const allCategories = useSelector((state) => state.category.allCategories);
 
   // state
-  const [fileList, setFileList] = useState([
-    {
-      uid: "-1",
-      name: "image.png",
-      status: "done",
-      url: productDetail.thumbnailUrl,
-    },
-  ]);
+  const [fileList, setFileList] = useState([]);
+
+  useMemo(() => {
+    setFileList((prev) => [
+      { ...prev, uid: "-1", name: "image.png", status: "done", url: productDetail.thumbnailUrl },
+    ]);
+  }, [productDetail.thumbnailUrl]);
   const [category, setCategory] = useState({});
 
   useEffect(() => {
@@ -144,7 +144,7 @@ const ProductDetail = () => {
                   color: productDetail.color ? productDetail.color : "",
                   price: productDetail.price ? productDetail.price : "",
                   description: productDetail.description ? productDetail.description : "",
-                  status: productDetail?.status,
+                  status: productDetail.status,
                 }}
               >
                 <Descriptions
@@ -163,8 +163,8 @@ const ProductDetail = () => {
                     </Form.Item>
                   </Descriptions.Item>
                   <Descriptions.Item label="Color">
-                    <Form.Item name="color" style={{ marginBottom: 0 }}>
-                      <Input />
+                    <Form.Item name="color" valuePropName="color" style={{ marginBottom: 0 }}>
+                      <InputColor />
                     </Form.Item>
                   </Descriptions.Item>
                   <Descriptions.Item label="Price">
@@ -174,7 +174,7 @@ const ProductDetail = () => {
                   </Descriptions.Item>
                   <Descriptions.Item label="Description">
                     <Form.Item name="description" style={{ marginBottom: 0 }}>
-                      <TextArea />
+                      <TextArea autoSize />
                     </Form.Item>
                   </Descriptions.Item>
                   <Descriptions.Item label="Category">
