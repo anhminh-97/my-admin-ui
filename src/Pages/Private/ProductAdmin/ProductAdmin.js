@@ -206,14 +206,17 @@ const ProductAdmin = () => {
       title: "Short Description",
       dataIndex: "shortDescription",
       key: "shortDescription",
-      render: (description) => <Paragraph ellipsis={{ rows: 2 }}>{description}</Paragraph>,
+      render: (shortDescription) =>
+        shortDescription ? <Paragraph ellipsis={{ rows: 2 }}>{shortDescription}</Paragraph> : "-",
     },
     {
       title: "Category",
       dataIndex: "categories",
       key: "categories",
       render: (categories) =>
-        categories.map((item, index) => <Tag key={index.toString()}>{item}</Tag>),
+        categories.length
+          ? categories.map((item, index) => <Tag key={index.toString()}>{item}</Tag>)
+          : "-",
     },
     {
       title: "Type",
