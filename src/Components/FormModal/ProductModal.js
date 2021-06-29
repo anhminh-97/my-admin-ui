@@ -56,16 +56,7 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         </Form.Item>
         <Row gutter={24}>
           <Col span={12}>
-            <Form.Item
-              name="originalPrice"
-              label="Original Price"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the price of product!",
-                },
-              ]}
-            >
+            <Form.Item name="originalPrice" label="Original Price">
               <InputNumber
                 min={0}
                 formatter={(value) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
