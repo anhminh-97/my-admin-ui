@@ -18,6 +18,7 @@ import {
   Slider,
   Space,
   Spin,
+  Statistic,
   Switch,
   Table,
   Tag,
@@ -25,18 +26,12 @@ import {
 import Paragraph from "antd/lib/typography/Paragraph";
 import { ProductModal } from "Components/FormModal";
 import { ROUTER } from "Constants/CommonConstants";
-import {
-  addProduct,
-  deleteProduct,
-  getAllProducts,
-  updateProduct,
-} from "Features/Product/ProductSlice";
-import useGetCategory from "Hooks/CategoryHook";
+import { deleteProduct, getAllProducts, updateProduct } from "Features/Product/ProductSlice";
 import moment from "moment";
 import queryString from "query-string";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import "./ProductAdmin.Style.less";
 
 const { Option } = Select;
@@ -50,7 +45,6 @@ const ProductAdmin = () => {
   const allProducts = useSelector((state) => state.product.allProducts);
   const loading = useSelector((state) => state.product.loading);
   const total = useSelector((state) => state.product.total);
-  const allCategories = useSelector((state) => state.category.allCategories);
 
   // useState
   const [visible, setVisible] = useState(false);
@@ -80,7 +74,6 @@ const ProductAdmin = () => {
     dispatch(getAllProducts(queryParams));
   }, [queryParams, dispatch]);
 
-  useGetCategory();
   const stringified = queryString.stringify(filters);
 
   const showModal = (value) => {
@@ -102,19 +95,6 @@ const ProductAdmin = () => {
     setVisible(false);
     setEditMode(false);
     setData({});
-  };
-
-  // Create
-  const onHandleCreate = async (value) => {
-    setVisible(false);
-    setData({});
-    const resultAction = await dispatch(addProduct(value));
-    if (resultAction.error) {
-      message.error("Create Failed");
-    } else {
-      message.success("Create Successfully");
-      dispatch(getAllProducts(queryParams));
-    }
   };
 
   // Update
@@ -155,7 +135,7 @@ const ProductAdmin = () => {
 
   // Filters
   const handleSortBy = (value) => {
-    setFilters((prev) => ({ ...prev, _sort: "price", _order: value }));
+    setFilters((prev) => ({ ...prev, _sort: "originalPrice", _order: value }));
   };
   const handleSearch = (e) => {
     setFilters((prev) => ({ ...prev, name_like: e.target.value }));
@@ -168,7 +148,7 @@ const ProductAdmin = () => {
     history.push({ pathname: history.location.pathname, search: stringifiedParams });
   };
   const handleSortPrice = (value) => {
-    setFilters((prev) => ({ ...prev, price_gte: value[0], price_lte: value[1] }));
+    setFilters((prev) => ({ ...prev, originalPrice_gte: value[0], originalPrice_lte: value[1] }));
   };
   const handleFilterStatus = (value) => {
     setFilters((prev) => ({ ...prev, status: value }));
@@ -196,34 +176,49 @@ const ProductAdmin = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-    },
-    {
-      title: "Color",
-      dataIndex: "color",
-      key: "color",
-      render: (color) => <Tag key={color}>{color?.toUpperCase()}</Tag>,
+      render: (name) => <Paragraph ellipsis={{ rows: 2 }}>{name}</Paragraph>,
     },
     {
       title: "Price",
-      dataIndex: "price",
       key: "price",
+      render: (value, record) => (
+        <>
+          {record.originalPrice ? (
+            <Statistic
+              value={record.originalPrice}
+              valueStyle={{ fontSize: "14px" }}
+              className={record.salePrice && "original-price"}
+            />
+          ) : (
+            "-"
+          )}
+          <div>
+            {record.salePrice ? (
+              <Statistic valueStyle={{ fontSize: "14px" }} value={record.salePrice} />
+            ) : (
+              "-"
+            )}
+          </div>
+        </>
+      ),
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
+      title: "Short Description",
+      dataIndex: "shortDescription",
+      key: "shortDescription",
       render: (description) => <Paragraph ellipsis={{ rows: 2 }}>{description}</Paragraph>,
     },
     {
       title: "Category",
-      dataIndex: "categoryId",
-      key: "categoryId",
-      render: (id) =>
-        allCategories
-          .filter((item) => item.id === id)
-          .map((item, index) => {
-            return <span key={index.toString()}>{item.name}</span>;
-          }),
+      dataIndex: "categories",
+      key: "categories",
+      render: (categories) =>
+        categories.map((item, index) => <Tag key={index.toString()}>{item}</Tag>),
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
     },
     {
       title: "Create At",
@@ -233,9 +228,9 @@ const ProductAdmin = () => {
     },
     {
       title: "Update At",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      render: (updateAt) => moment(updateAt).format("DD/MM/YYYY"),
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (updatedAt) => moment(updatedAt).format("DD/MM/YYYY"),
     },
     {
       title: "Status",
@@ -260,9 +255,7 @@ const ProductAdmin = () => {
           <EditOutlined onClick={() => showModal(record)} />
           <Popconfirm
             title="Are you sure to delete this product?"
-            onConfirm={() => {
-              onConfirm(record.id);
-            }}
+            onConfirm={() => onConfirm(record.id)}
             okText="Yes"
             cancelText="No"
           >
@@ -284,13 +277,18 @@ const ProductAdmin = () => {
       ),
     },
   ];
+
+  const dataSource = allProducts.map((item) => ({ ...item, key: item.id }));
+
   return (
     <div className="product-admin-wrapper">
       <Spin spinning={loading} tip="Loading..." className="spin-loading">
         <Row justify="end">
           <Col>
-            <Button onClick={() => setVisible(true)} type="primary">
-              <PlusOutlined /> Add new
+            <Button type="primary">
+              <Link to={ROUTER.AddProduct}>
+                <PlusOutlined /> Add new
+              </Link>
             </Button>
           </Col>
         </Row>
@@ -298,10 +296,10 @@ const ProductAdmin = () => {
         <Row justify="space-between">
           <Col span={8}>
             <Slider
-              value={[filters.price_gte, filters.price_lte]}
-              marks={{ 0: "0", 1000: "1000" }}
+              value={[filters.originalPrice_gte, filters.originalPrice_lte]}
+              marks={{ 0: "0", 100000: "100.000" }}
               range
-              max={1000}
+              max={100000}
               onChange={handleSortPrice}
             />
           </Col>
@@ -336,7 +334,7 @@ const ProductAdmin = () => {
           </Col>
         </Row>
         <Table
-          dataSource={allProducts}
+          dataSource={dataSource}
           columns={columns}
           onChange={handlePagination}
           pagination={{
@@ -344,14 +342,19 @@ const ProductAdmin = () => {
             total: `${total}`,
             current: Number.parseInt(filters._page),
             pageSize: Number.parseInt(filters._limit),
-            showTotal: (total) => `Total: ${total}`,
+            showTotal: (total) => (
+              <span>
+                {total}
+                {total > 1 ? " items" : " item"}
+              </span>
+            ),
           }}
         />
         {visible && (
           <ProductModal
             visible={visible}
             onCancel={onCancel}
-            onCreate={editMode ? onHandleUpdate : onHandleCreate}
+            onCreate={onHandleUpdate}
             data={data}
             editMode={editMode}
           />

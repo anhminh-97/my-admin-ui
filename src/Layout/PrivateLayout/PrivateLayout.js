@@ -51,8 +51,13 @@ const PrivateLayout = ({ children }) => {
           {collapsed ? <HomeOutlined className="home-icon" /> : "MY ADMIN"}
         </Link>
 
-        <Menu theme="dark" mode="inline">
-          <Menu.Item key="all-orders" icon={<DashboardOutlined />}>
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={[pathname.slice(1)]}
+          // defaultOpenKeys="sub-products"
+        >
+          <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
             <Link to={ROUTER.Dashboard}>Dashboard</Link>
           </Menu.Item>
           <SubMenu key="pages" title="Pages" icon={<CopyOutlined />}>
@@ -68,12 +73,15 @@ const PrivateLayout = ({ children }) => {
             <Menu.Item key="10">Add new</Menu.Item>
             <Menu.Item key="11">Category</Menu.Item>
           </SubMenu>
-          <SubMenu key="production" icon={<ShoppingCartOutlined />} title="Products">
+          <SubMenu key="sub-products" icon={<ShoppingCartOutlined />} title="Products">
             <Menu.Item key="products">
               <Link to={ROUTER.ProductAdmin}>All Products</Link>
             </Menu.Item>
-            <Menu.Item key="category">
-              <Link to={ROUTER.CategoryAdmin}>Category</Link>
+            <Menu.Item key="addProducts">
+              <Link to={ROUTER.AddProduct}>Add new</Link>
+            </Menu.Item>
+            <Menu.Item key="categories">
+              <Link to={ROUTER.CategoryAdmin}>Categories</Link>
             </Menu.Item>
           </SubMenu>
         </Menu>

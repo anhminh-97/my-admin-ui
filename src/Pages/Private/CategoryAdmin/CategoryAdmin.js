@@ -185,9 +185,9 @@ const CategoryAdmin = () => {
     },
     {
       title: "Update At",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      render: (updateAt) => moment(updateAt).format("DD/MM/YYYY"),
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (updatedAt) => moment(updatedAt).format("DD/MM/YYYY"),
     },
     {
       title: "Status",
@@ -262,7 +262,12 @@ const CategoryAdmin = () => {
             total: total,
             current: Number.parseInt(filter._page),
             pageSize: Number.parseInt(filter._limit),
-            showTotal: (total) => <span>Total: {total}</span>,
+            showTotal: (total) => (
+              <span>
+                {total}
+                {total > 1 ? " items" : " item"}
+              </span>
+            ),
           }}
         />
         {visible && (

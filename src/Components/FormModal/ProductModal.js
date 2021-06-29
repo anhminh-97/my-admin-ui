@@ -1,44 +1,20 @@
-import { Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select } from "antd";
-import moment from "moment";
-import isEmpty from "lodash/isEmpty";
-import React, { useState, useEffect } from "react";
+import { Checkbox, Col, Form, Input, InputNumber, Modal, Row, Tag } from "antd";
+import Text from "antd/lib/typography/Text";
+import useGetCategory from "Hooks/CategoryHook";
+import React from "react";
 import { useSelector } from "react-redux";
-import InputColor from "Components/InputColor";
-
-const { Option } = Select;
 
 const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
   const [form] = Form.useForm();
+  useGetCategory();
+
+  // Redux
   const allCategories = useSelector((state) => state.category.allCategories);
-
-  const [category, setCategory] = useState({});
-
-  useEffect(() => {
-    if (isEmpty(category)) {
-      setCategory(
-        !isEmpty(data)
-          ? {
-              ...allCategories
-                .filter((item) => item.id === data.categoryId)
-                .map((item, index) => {
-                  <span key={index.toString()} />;
-                  return { ...category, name: item.name, id: item.id };
-                })[0],
-            }
-          : category
-      );
-    }
-  }, [allCategories, data, category]);
-
-  // Select
-  const handleSelect = (values, item) => {
-    setCategory(item.attr);
-  };
 
   return (
     <Modal
       visible={visible}
-      title={editMode ? "Edit product" : "Create a new product"}
+      title={editMode ? "Quick Edit" : "Create a new product"}
       okText={editMode ? "Update" : "Create"}
       cancelText="Cancel"
       onCancel={onCancel}
@@ -46,9 +22,8 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         form
           .validateFields()
           .then((values) => {
-            const value = { ...values, categoryId: category.id };
             form.resetFields();
-            onCreate(value);
+            onCreate(values);
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -60,10 +35,11 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         layout="vertical"
         name="form_in_modal"
         initialValues={{
-          name: data.name ? data.name : "",
-          color: data.color ? data.color : "",
-          price: data.price ? data.price : "",
-          description: data.description ? data.description : "",
+          name: data.name || "",
+          originalPrice: data.originalPrice || "",
+          salePrice: data.salePrice || "",
+          shortDescription: data.shortDescription || "",
+          categories: data.categories || [],
         }}
       >
         <Form.Item
@@ -78,14 +54,11 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
         >
           <Input />
         </Form.Item>
-        <Form.Item name="color" label="Color:" valuePropName="color">
-          <InputColor />
-        </Form.Item>
         <Row gutter={24}>
-          <Col>
+          <Col span={12}>
             <Form.Item
-              name="price"
-              label="Price:"
+              name="originalPrice"
+              label="Original Price"
               rules={[
                 {
                   required: true,
@@ -93,47 +66,83 @@ const ProductModal = ({ visible, onCreate, onCancel, data, editMode }) => {
                 },
               ]}
             >
-              <InputNumber min={0} />
+              <InputNumber
+                min={0}
+                formatter={(value) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                style={{ width: "200px" }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="salePrice" label="Sale Price">
+              <InputNumber
+                min={0}
+                formatter={(value) => value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                style={{ width: "200px" }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Color">
+              {data.color.map((item, index) => (
+                <Tag key={index.toString()} color={data.color}>
+                  {item}
+                </Tag>
+              ))}
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Size">
+              {data.size.map((item, index) => (
+                <Tag key={index.toString()}>{item}</Tag>
+              ))}
             </Form.Item>
           </Col>
           <Col>
-            <Form.Item label="Category:">
-              {allCategories && (
-                <Select
-                  placeholder="Select a category"
-                  value={category.name}
-                  style={{ width: 120 }}
-                  onChange={handleSelect}
-                >
-                  {allCategories.map((item, index) => {
-                    return (
-                      <Option value={item.name} key={index.toString()} attr={item}>
-                        {item.name}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              )}
+            <Form.Item
+              label={<Text strong>Categories</Text>}
+              name="categories"
+              valuePropName="value"
+            >
+              <Checkbox.Group style={{ width: "100%" }}>
+                <Row>
+                  <Col span={24}>
+                    {allCategories.map((item) => {
+                      return (
+                        <Checkbox
+                          value={item.name}
+                          key={item.id}
+                          style={{ width: "25%", margin: 0 }}
+                        >
+                          {item.name}
+                        </Checkbox>
+                      );
+                    })}
+                  </Col>
+                </Row>
+              </Checkbox.Group>
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item name="description" label="Description:">
-          <Input.TextArea autoSize />
+        <Form.Item name="shortDescription" label={<Text strong>Short Description</Text>}>
+          <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} />
         </Form.Item>
-        {editMode && (
+        {/* {editMode && (
           <Row gutter={24}>
-            <Col>
+            <Col span={12}>
               <Form.Item label="Created At:">
                 <DatePicker disabled defaultValue={moment(data.createdAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
-            <Col>
+            <Col span={12}>
               <Form.Item label="Updated At:">
-                <DatePicker disabled defaultValue={moment(data.updateAt)} format="DD/MM/YYYY" />
+                <DatePicker disabled defaultValue={moment(data.updatedAt)} format="DD/MM/YYYY" />
               </Form.Item>
             </Col>
           </Row>
-        )}
+        )} */}
       </Form>
     </Modal>
   );

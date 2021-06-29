@@ -12,6 +12,7 @@ import {
   Login,
   ProductDetail,
   NotFound,
+  AddProduct,
 } from "Pages";
 // import UserAdmin from "Pages/Private/UserAdmin";
 
@@ -24,6 +25,7 @@ const Routes = () => {
         <PrivateRoute path={ROUTER.Dashboard} exact component={Dashboard} />
         <PrivateRoute path={ROUTER.ProductAdmin} exact component={ProductAdmin} />
         <PrivateRoute path={ROUTER.CategoryAdmin} exact component={CategoryAdmin} />
+        <PrivateRoute path={ROUTER.AddProduct} exact component={AddProduct} />
         {/* <PrivateRoute path={ROUTER.User} exact component={UserAdmin} /> */}
         <PrivateRoute path={`${ROUTER.ProductDetail}/:id`} component={ProductDetail} />
         <PublicRoute component={NotFound} />

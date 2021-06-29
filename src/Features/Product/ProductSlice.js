@@ -12,13 +12,13 @@ export const getProduct = createAsyncThunk("product/getProduct", async (id) => {
 });
 
 export const addProduct = createAsyncThunk("product/addProduct", async (data) => {
-  await ProductApi.add(data);
-  return data;
+  const response = await ProductApi.add(data);
+  return response;
 });
 
 export const updateProduct = createAsyncThunk("product/updateProduct", async (data) => {
-  await ProductApi.update(data);
-  return data;
+  const response = await ProductApi.update(data);
+  return response;
 });
 
 export const deleteProduct = createAsyncThunk("product/deleteProduct", async (id) => {
@@ -75,13 +75,7 @@ const ProductSlice = createSlice({
       state.loading = true;
     },
     [updateProduct.fulfilled]: (state, action) => {
-      // const data = action.payload;
-      // state.allProducts = state.allProducts
-      //   .filter((item) => item.id === data.id)
-      //   .map((item) => {
-      //     const { UpdatedData } = { ...item, data };
-      //     return UpdatedData;
-      //   });
+      state.productDetail = action.payload;
       state.loading = false;
     },
     [updateProduct.rejected]: (state) => {
