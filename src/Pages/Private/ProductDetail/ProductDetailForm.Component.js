@@ -22,7 +22,7 @@ import { useHistory, useParams } from "react-router-dom";
 import UploadImage from "Components/UploadImage";
 import { ROUTER } from "Constants/CommonConstants";
 import { ProductContext } from "Context/SimpleProductContext";
-import { deleteProduct, updateProduct } from "Features/Product/ProductSlice";
+import { deleteProduct, getProduct, updateProduct } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
 import ProductData from "./ProductData.Component";
 
@@ -132,6 +132,7 @@ const ProductDetailForm = () => {
         if (resultAction.error) {
           message.error("Update Failed");
         } else {
+          dispatch(getProduct(id));
           message.success("Update Successfully");
         }
       })

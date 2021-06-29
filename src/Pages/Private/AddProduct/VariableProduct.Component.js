@@ -30,8 +30,7 @@ const VariableProduct = () => {
         key="variations"
       >
         <Alert
-          message="Error"
-          description="Before you can add a variation product, you must add some attributes of this product to the
+          message="Before you can add a variation product, you must add some attributes of this product to the
         tag attribute."
           type="error"
           showIcon

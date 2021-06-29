@@ -5,7 +5,7 @@ import {
   ProfileOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Collapse, Row, Select, Space, Switch, Tabs } from "antd";
+import { Alert, Button, Col, Collapse, Row, Select, Space, Switch, Tabs } from "antd";
 import { ProductContext } from "Context/SimpleProductContext";
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -114,67 +114,76 @@ const VariableProduct = () => {
         }
         key="variations"
       >
-        <Row gutter={[24, 24]}>
-          <Col>
-            <Select placeholder="Choose color" style={{ width: "130px" }} onChange={handleColor}>
-              {productDetail.color.map((item, index) => (
-                <Option key={index.toString()} value={item}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col>
-            <Select placeholder="Choose size" style={{ width: "130px" }} onChange={handleSize}>
-              {productDetail.size.map((item, index) => (
-                <Option key={index.toString()} value={item}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col>
-            <Button type="primary" ghost onClick={onHandleAdd}>
-              Add
-            </Button>
-          </Col>
-          <Col span={24}>
-            <Collapse>
-              {variations.map((item, index) => (
-                <Panel
-                  header={
-                    <Space>
-                      {item.color}
-                      <MinusOutlined />
-                      {item.size}
-                    </Space>
-                  }
-                  key={index.toString()}
-                >
-                  <Row gutter={[24, 24]}>
-                    <Col span={24}>
-                      <PriceTab
-                        originalPrice={item.originalPrice || ""}
-                        salePrice={item.salePrice || ""}
-                        handleOriginalPrice={(value) => handleOriginalPrice(value, item.id)}
-                        handleSalePrice={(value) => handleSalePrice(value, item.id)}
-                      />
-                    </Col>
-                    <Col span={24}>
-                      <p style={{ marginBottom: "8px" }}>Stock status</p>
-                      <Switch
-                        defaultChecked={attributes.status}
-                        checkedChildren={<CheckOutlined />}
-                        unCheckedChildren={<CloseOutlined />}
-                        onChange={(e) => handleStatus(item.id, e)}
-                      />
-                    </Col>
-                  </Row>
-                </Panel>
-              ))}
-            </Collapse>
-          </Col>
-        </Row>
+        {productDetail.color.length || productDetail.size.length ? (
+          <Row gutter={[24, 24]}>
+            <Col>
+              <Select placeholder="Choose color" style={{ width: "130px" }} onChange={handleColor}>
+                {productDetail.color.map((item, index) => (
+                  <Option key={index.toString()} value={item}>
+                    {item}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col>
+              <Select placeholder="Choose size" style={{ width: "130px" }} onChange={handleSize}>
+                {productDetail.size.map((item, index) => (
+                  <Option key={index.toString()} value={item}>
+                    {item}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col>
+              <Button type="primary" ghost onClick={onHandleAdd}>
+                Add
+              </Button>
+            </Col>
+            <Col span={24}>
+              <Collapse>
+                {variations.map((item, index) => (
+                  <Panel
+                    header={
+                      <Space>
+                        {item.color}
+                        <MinusOutlined />
+                        {item.size}
+                      </Space>
+                    }
+                    key={index.toString()}
+                  >
+                    <Row gutter={[24, 24]}>
+                      <Col span={24}>
+                        <PriceTab
+                          originalPrice={item.originalPrice || ""}
+                          salePrice={item.salePrice || ""}
+                          handleOriginalPrice={(value) => handleOriginalPrice(value, item.id)}
+                          handleSalePrice={(value) => handleSalePrice(value, item.id)}
+                        />
+                      </Col>
+                      <Col span={24}>
+                        <p style={{ marginBottom: "8px" }}>Stock status</p>
+                        <Switch
+                          defaultChecked={attributes.status}
+                          checkedChildren={<CheckOutlined />}
+                          unCheckedChildren={<CloseOutlined />}
+                          onChange={(e) => handleStatus(item.id, e)}
+                        />
+                      </Col>
+                    </Row>
+                  </Panel>
+                ))}
+              </Collapse>
+            </Col>
+          </Row>
+        ) : (
+          <Alert
+            message="Before you can add a variation product, you must add some attributes of this product to the
+        tag attribute."
+            type="error"
+            showIcon
+          />
+        )}
       </TabPane>
     </Tabs>
   );
