@@ -15,7 +15,8 @@ import {
 import Text from "antd/lib/typography/Text";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import CKEditor from "react-ckeditor-component";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
@@ -48,19 +49,16 @@ const ProductDetailForm = () => {
   });
   const [type, setType] = useState(productDetail.type);
   const { simpleProduct, variableProduct } = useContext(ProductContext);
-  const [price, setPrice] = useState({
-    originalPrice: simpleProduct.originalPrice,
-    salePrice: simpleProduct.salePrice,
-  });
+  const [price, setPrice] = useState({});
 
   useMemo(() => {
     setFileList((prev) =>
       productDetail.productGallery?.map((item) => ({
         ...prev,
-        uid: uuidv4(),
+        uid: item.id,
         name: "image.png",
         status: "done",
-        url: item,
+        url: item.url,
       }))
     );
     setProductImage(
@@ -82,8 +80,9 @@ const ProductDetailForm = () => {
     setCategories(value);
   };
   // Handle description
-  const handleDescription = (e) => {
-    setContent(e.editor.getData());
+  const handleDescription = (e, editor) => {
+    const data = editor.getData();
+    setContent(data);
   };
 
   // Handle type
@@ -98,8 +97,8 @@ const ProductDetailForm = () => {
   };
 
   // Handle product image
-  const handleProductImage = (image) => {
-    setImage((prev) => ({ ...prev, productImage: image[0] }));
+  const handleProductImage = (value) => {
+    setImage((prev) => ({ ...prev, productImage: value[0].url }));
   };
   const handleRemoveImage = (value) => {
     setImage((prev) => ({ ...prev, productImage: "" }));
@@ -110,7 +109,8 @@ const ProductDetailForm = () => {
     setImage((prev) => ({ ...prev, productGallery: gallery }));
   };
   const handleRemoveGallery = (value) => {
-    setImage((prev) => prev.filter((item) => item !== value));
+    const newValue = image.productGallery.filter((item) => item.id !== value.uid);
+    setImage((prev) => ({ ...prev, productGallery: newValue }));
   };
   // Handle update
   const handleUpdate = () => {
@@ -197,13 +197,7 @@ const ProductDetailForm = () => {
 
             <Col span={24}>
               <Form.Item label={<Text strong>Product description</Text>}>
-                <CKEditor
-                  content={content}
-                  events={{
-                    change: handleDescription,
-                  }}
-                  config={{ resize_maxHeight: 350 }}
-                />
+                <CKEditor data={content} editor={ClassicEditor} onChange={handleDescription} />
               </Form.Item>
             </Col>
             <Col span={24}>

@@ -8,10 +8,12 @@ import { addProduct } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
 import moment from "moment";
 import React, { useContext, useState } from "react";
-import CKEditor from "react-ckeditor-component";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import ProductData from "./ProductData.Component";
+import { storage } from "../../../Firebase";
 
 const AddProductForm = () => {
   const history = useHistory();
@@ -33,6 +35,7 @@ const AddProductForm = () => {
   });
   const [type, setType] = useState("simple");
   const { simpleProduct } = useContext(ProductContext);
+  const [imageDesc, setImageDesc] = useState(null);
 
   const product = {
     name: "",
@@ -57,8 +60,10 @@ const AddProductForm = () => {
     setCategories(value);
   };
   // Handle description
-  const handleDescription = (e) => {
-    setContent(e.editor.getData());
+  const handleDescription = (e, editor) => {
+    const data = editor.getData();
+    setContent(data);
+    console.log("data :>> ", data);
   };
 
   // Handle type
@@ -67,10 +72,10 @@ const AddProductForm = () => {
   };
 
   // Handle product image
-  const handleProductImage = (image) => {
-    setImage((prev) => ({ ...prev, productImage: image[0] }));
+  const handleProductImage = (value) => {
+    setImage((prev) => ({ ...prev, productImage: value[0].url }));
   };
-  const handleRemoveImage = (value) => {
+  const handleRemoveImage = () => {
     setImage((prev) => ({ ...prev, productImage: "" }));
   };
 
@@ -79,7 +84,8 @@ const AddProductForm = () => {
     setImage((prev) => ({ ...prev, productGallery: gallery }));
   };
   const handleRemoveGallery = (value) => {
-    setImage((prev) => prev.filter((item) => item !== value));
+    const newValue = image.productGallery.filter((item) => item.id !== value.uid);
+    setImage((prev) => ({ ...prev, productGallery: newValue }));
   };
   // Handle update
   const handleCreate = () => {
@@ -110,6 +116,95 @@ const AddProductForm = () => {
       .catch((info) => {
         message.error(info);
       });
+  };
+
+  class MyUploadAdapter {
+    constructor(loader) {
+      this.loader = loader;
+    }
+    // Starts the upload process.
+    upload() {
+      return this.loader.file.then(
+        (file) =>
+          new Promise((resolve, reject) => {
+            let storages = storage.ref();
+            let uploadTask = storages.child(file.name).put(file);
+            uploadTask.on(
+              storages.TaskEvent.STATE_CHANGED, // or 'state_changed'
+              function (snapshot) {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log("Upload is " + progress + "% done");
+                switch (snapshot.state) {
+                  case storages.TaskState.PAUSED: // or 'paused'
+                    console.log("Upload is paused");
+                    break;
+                  case storages.TaskState.RUNNING: // or 'running'
+                    console.log("Upload is running");
+                    break;
+                  default:
+                    return;
+                }
+              },
+              function (error) {
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                // eslint-disable-next-line default-case
+                switch (error.code) {
+                  case "storage/unauthorized":
+                    reject(" User doesn't have permission to access the object");
+                    break;
+
+                  case "storage/canceled":
+                    reject("User canceled the upload");
+                    break;
+
+                  case "storage/unknown":
+                    reject("Unknown error occurred, inspect error.serverResponse");
+                    break;
+                }
+              },
+              function () {
+                // Upload completed successfully, now we can get the download URL
+                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                  // console.log("File available at", downloadURL);
+                  resolve({
+                    default: downloadURL,
+                  });
+                });
+              }
+            );
+          })
+      );
+    }
+  }
+
+  const handleUpload = () => {
+    storage
+      .ref(`images/${imageDesc.name}`)
+      .put(imageDesc)
+      .then(function (snapshot) {
+        return snapshot.ref.getDownloadURL();
+      })
+      .then((url) => {
+        console.log("url :>> ", url);
+      });
+  };
+
+  function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+      loader.on("change:uploadResponse", (evt, name, val, oldval) => {
+        if (val) {
+          console.log(val); // object response {default: image_link }
+        }
+      });
+      console.log("loader :>> ", loader);
+      return new MyUploadAdapter(loader);
+    };
+  }
+
+  const editorConfiguration = {
+    extraPlugins: [MyCustomUploadAdapterPlugin],
   };
 
   return (
@@ -158,11 +253,10 @@ const AddProductForm = () => {
             <Col span={24}>
               <Form.Item label={<Text strong>Product description</Text>}>
                 <CKEditor
-                  content={content}
-                  events={{
-                    change: handleDescription,
-                  }}
-                  config={{ resize_maxHeight: 350 }}
+                  data={content}
+                  editor={ClassicEditor}
+                  onChange={handleDescription}
+                  config={editorConfiguration}
                 />
               </Form.Item>
             </Col>
