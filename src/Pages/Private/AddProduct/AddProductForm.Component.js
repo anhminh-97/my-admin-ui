@@ -13,7 +13,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import ProductData from "./ProductData.Component";
-import { storage } from "../../../Firebase";
+import MyUploadAdapter from "Components/MyUploadAdapter";
 
 const AddProductForm = () => {
   const history = useHistory();
@@ -62,7 +62,6 @@ const AddProductForm = () => {
   const handleDescription = (e, editor) => {
     const data = editor.getData();
     setContent(data);
-    console.log("data :>> ", data);
   };
 
   // Handle type
@@ -117,107 +116,6 @@ const AddProductForm = () => {
       });
   };
 
-  // class MyUploadAdapter {
-  //   constructor(loader) {
-  //     this.loader = loader;
-  //   }
-  //   // Starts the upload process.
-  //   upload() {
-  //     return this.loader.file.then(
-  //       (file) =>
-  //         new Promise((resolve, reject) => {
-  //           let storages = storage.ref();
-  //           let uploadTask = storages.child(file.name).put(file);
-  //           uploadTask.on(
-  //             storages.TaskEvent.STATE_CHANGED, // or 'state_changed'
-  //             function (snapshot) {
-  //               // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-  //               var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-  //               console.log("Upload is " + progress + "% done");
-  //               switch (snapshot.state) {
-  //                 case storages.TaskState.PAUSED: // or 'paused'
-  //                   console.log("Upload is paused");
-  //                   break;
-  //                 case storages.TaskState.RUNNING: // or 'running'
-  //                   console.log("Upload is running");
-  //                   break;
-  //                 default:
-  //                   return;
-  //               }
-  //             },
-  //             function (error) {
-  //               // A full list of error codes is available at
-  //               // https://firebase.google.com/docs/storage/web/handle-errors
-  //               // eslint-disable-next-line default-case
-  //               switch (error.code) {
-  //                 case "storage/unauthorized":
-  //                   reject(" User doesn't have permission to access the object");
-  //                   break;
-
-  //                 case "storage/canceled":
-  //                   reject("User canceled the upload");
-  //                   break;
-
-  //                 case "storage/unknown":
-  //                   reject("Unknown error occurred, inspect error.serverResponse");
-  //                   break;
-  //               }
-  //             },
-  //             function () {
-  //               // Upload completed successfully, now we can get the download URL
-  //               uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-  //                 // console.log("File available at", downloadURL);
-  //                 resolve({
-  //                   default: downloadURL,
-  //                 });
-  //               });
-  //             }
-  //           );
-  //         })
-  //     );
-  //   }
-  // }
-  //
-
-  const MyUploadAdapter = (file) => {
-    const uploadImage = storage.ref(`images/${file.id}`).put(file);
-    uploadImage.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        console.log("progress :>> ", progress);
-      },
-      (error) => {
-        console.log("error :>> ", error);
-      },
-      () => {
-        storage
-          .ref("images")
-          .child(file.id)
-          .getDownloadURL()
-          .then((url) => {
-            console.log("url :>> ", url);
-          });
-      }
-    );
-  };
-
-  function MyCustomUploadAdapterPlugin(editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-      loader.on("change:uploadResponse", (evt, name, val, oldval) => {
-        if (val) {
-          console.log(val); // object response {default: image_link }
-        }
-      });
-      console.log("loader :>> ", loader);
-      return MyUploadAdapter(loader);
-    };
-  }
-
-  const editorConfiguration = {
-    extraPlugins: [MyCustomUploadAdapterPlugin],
-  };
-
   return (
     <Form
       form={form}
@@ -267,7 +165,11 @@ const AddProductForm = () => {
                   data={content}
                   editor={ClassicEditor}
                   onChange={handleDescription}
-                  config={editorConfiguration}
+                  onReady={(editor) => {
+                    editor.plugins.get("FileRepository").createUploadAdapter = function (loader) {
+                      return new MyUploadAdapter(loader);
+                    };
+                  }}
                 />
               </Form.Item>
             </Col>

@@ -26,6 +26,7 @@ import { ProductContext } from "Context/SimpleProductContext";
 import { deleteProduct, getProduct, updateProduct } from "Features/Product/ProductSlice";
 import useGetCategory from "Hooks/CategoryHook";
 import ProductData from "./ProductData.Component";
+import MyUploadAdapter from "Components/MyUploadAdapter";
 
 const ProductDetailForm = () => {
   const history = useHistory();
@@ -197,7 +198,16 @@ const ProductDetailForm = () => {
 
             <Col span={24}>
               <Form.Item label={<Text strong>Product description</Text>}>
-                <CKEditor data={content} editor={ClassicEditor} onChange={handleDescription} />
+                <CKEditor
+                  data={content}
+                  editor={ClassicEditor}
+                  onChange={handleDescription}
+                  onReady={(editor) => {
+                    editor.plugins.get("FileRepository").createUploadAdapter = function (loader) {
+                      return new MyUploadAdapter(loader);
+                    };
+                  }}
+                />
               </Form.Item>
             </Col>
             <Col span={24}>
