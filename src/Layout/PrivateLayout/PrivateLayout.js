@@ -60,7 +60,7 @@ const PrivateLayout = ({ children }) => {
           <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
             <Link to={ROUTER.Dashboard}>Dashboard</Link>
           </Menu.Item>
-          <SubMenu key="pages" title="Pages" icon={<CopyOutlined />}>
+          {/* <SubMenu key="pages" title="Pages" icon={<CopyOutlined />}>
             <Menu.Item key="allPages">All pages</Menu.Item>
             <Menu.Item key="add-page">Add new</Menu.Item>
           </SubMenu>
@@ -72,7 +72,7 @@ const PrivateLayout = ({ children }) => {
             <Menu.Item key="9">All posts</Menu.Item>
             <Menu.Item key="10">Add new</Menu.Item>
             <Menu.Item key="11">Category</Menu.Item>
-          </SubMenu>
+          </SubMenu> */}
           <SubMenu key="sub-products" icon={<ShoppingCartOutlined />} title="Products">
             <Menu.Item key="products">
               <Link to={ROUTER.ProductAdmin}>All Products</Link>
