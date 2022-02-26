@@ -1,14 +1,11 @@
 import {
-  CopyOutlined,
   DashboardOutlined,
   HomeOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  ProfileOutlined,
-  PushpinOutlined,
-  ShoppingCartOutlined,
-  UserOutlined,
+  ProfileOutlined, ShoppingCartOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import { Avatar, Breadcrumb, Col, Dropdown, Layout, Menu, Row } from "antd";
 import { ROUTER } from "Constants/CommonConstants";
@@ -55,7 +52,7 @@ const PrivateLayout = ({ children }) => {
           theme="dark"
           mode="inline"
           defaultSelectedKeys={[pathname.slice(1)]}
-          // defaultOpenKeys="sub-products"
+        // defaultOpenKeys="sub-products"
         >
           <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
             <Link to={ROUTER.Dashboard}>Dashboard</Link>
